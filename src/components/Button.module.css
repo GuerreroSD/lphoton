@@ -23,13 +23,13 @@
 
 /* ── Botón de navegación ─────────────────────────────────────────── */
 .nav {
-  min-width: 128px;
-  height: 56px;
-  padding: 0 var(--space-6);
+  min-width: clamp(112px, 9.5vw, 176px);
+  height: clamp(52px, 4.4vw, 60px);
+  padding: 0 clamp(var(--space-4), 2vw, var(--space-7));
   color: var(--color-accent);
   font-family: var(--font-title);
   font-weight: var(--weight-title);
-  font-size: var(--fs-nav);
+  font-size: clamp(var(--fs-nav), 1.05vw, 17px);
   text-transform: uppercase;
   letter-spacing: var(--tracking-caps);
 }
@@ -125,6 +125,7 @@
 
 /* ── Lupa ────────────────────────────────────────────────────────── */
 .search {
+  flex: none;
   width: 52px;
   height: 52px;
   padding: var(--space-1);

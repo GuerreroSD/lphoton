@@ -1,22 +1,29 @@
+/*
+ * Logo pegado a la izquierda, secciones centradas en el espacio que queda y
+ * lupa a la derecha. Todo escala con el ancho de la ventana (maximizada o no).
+ */
 .navbar {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: clamp(var(--space-4), 3.4vw, var(--space-7));
+  gap: clamp(var(--space-4), 2.4vw, var(--space-7));
   height: var(--navbar-height);
-  padding: 0 var(--space-6);
+  padding: 0 clamp(var(--space-4), 2.5vw, var(--space-7));
   background: var(--surface-navbar);
   flex: none;
 }
 
 .items {
   display: flex;
+  flex: 1;
+  justify-content: center;
   align-items: center;
+  min-width: 0;
   gap: clamp(var(--space-3), 2.6vw, var(--space-7));
 }
 
 .logoLink {
   display: inline-flex;
+  flex: none;
   border-radius: var(--radius-md);
   text-decoration: none;
 }

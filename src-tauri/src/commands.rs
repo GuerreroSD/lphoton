@@ -215,6 +215,48 @@ pub async fn delete_fix(state: State<'_, AppState>, id: i64) -> Result<(), Strin
     blocking(move || state.db.delete_fix(id)).await?.map_err(|e| e.to_string())
 }
 
+// ── Instalación de juegos no instalados ─────────────────────────────────
+
+/// Abre la instalación del juego en el cliente de su tienda.
+#[tauri::command]
+pub async fn install_game(state: State<'_, AppState>, platform: Platform, external_id: String) -> Result<(), String> {
+    let state = state.inner().clone();
+    blocking(move || {
+        let result = match platform {
+            Platform::Steam => {
+                let root = state.steam_root.as_ref().ok_or("No encontramos Steam en este equipo.")?;
+                let appid: u32 = external_id.parse().map_err(|_| "Identificador de juego de Steam inválido.")?;
+                steam::install(root, appid).map_err(|e| format!("No pudimos abrir Steam ({e})."))
+            }
+            Platform::Epic => {
+                let uri = crate::library::epic::install_uri(&external_id).ok_or("Identificador de juego de Epic inválido.")?;
+                tauri_plugin_opener::open_url(uri, None::<&str>).map_err(|e| format!("No pudimos abrir Epic Games ({e})."))
+            }
+            Platform::Gog => {
+                if external_id.is_empty() || !external_id.chars().all(|c| c.is_ascii_digit()) {
+                    return Err("Identificador de juego de GOG inválido.".to_string());
+                }
+                tauri_plugin_opener::open_url(format!("goggalaxy://openGameView/{external_id}"), None::<&str>)
+                    .map_err(|_| "No pudimos abrir GOG Galaxy. ¿Está instalado?".to_string())
+            }
+        };
+        crate::log_line(&state, &format!("install_requested platform={platform:?} id={external_id} ok={}", result.is_ok()));
+        result
+    })
+    .await?
+}
+
+/// Progreso de descarga de un juego de Steam (lee su appmanifest).
+#[tauri::command]
+pub async fn install_status(state: State<'_, AppState>, appid: u32) -> Result<steam::InstallStatus, String> {
+    let state = state.inner().clone();
+    blocking(move || match &state.steam_root {
+        Some(root) => steam::install_status(root, appid),
+        None => steam::InstallStatus { state: "none", ..Default::default() },
+    })
+    .await
+}
+
 // ── Configuraciones (§6.7) ──────────────────────────────────────────────
 
 #[tauri::command]

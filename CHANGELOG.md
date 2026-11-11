@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.7.0] – 2026-11-11 · Instalar juegos y barra responsiva
+
+### Instalar juegos no instalados
+- La ficha de un juego que no está instalado muestra **INSTALAR** (mismo estilo que JUGAR, con un ícono de descarga) en lugar de JUGAR.
+- LPhoton no descarga nada por su cuenta: abre la instalación en el cliente de la tienda.
+  - **Steam**: `steam://install/<appid>` (Steam pregunta en qué carpeta instalar).
+  - **Epic**: `com.epicgames.launcher://apps/…?action=install`.
+  - **GOG**: `goggalaxy://openGameView/<id>`.
+- **Progreso real en Steam**: la ficha lee el `appmanifest_<appid>.acf` cada 2 s y muestra "En cola" o "Descargando 40 % · 3,2 GB de 8 GB" con una barra de progreso. Si una descarga empezó en Steam, la ficha la muestra al abrirse. Al terminar, la biblioteca se vuelve a sincronizar sola y aparece JUGAR.
+- En Epic y GOG (que no exponen el progreso), la biblioteca se vuelve a sincronizar al regresar a LPhoton.
+- Backend: comandos `install_game` e `install_status`. 30 tests (antes 29).
+
+### Barra superior responsiva
+- El logo queda pegado a la izquierda, las secciones se centran en el espacio que sobra y la lupa queda a la derecha. Antes todo se agrupaba al medio al maximizar.
+- El logo, su caja y los botones de navegación crecen con el ancho de la ventana (`clamp`), de 1024 px a pantallas grandes.
+
 ## [0.6.0] – 2026-11-11 · Fase 6: Rendimiento y pulido
 
 ### Configuraciones (§6.7)

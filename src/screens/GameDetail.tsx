@@ -1,15 +1,17 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { BackGlyph } from "../assets/icons/icons";
-import { LightModeButton, PlayButton, SkipButton } from "../components/Button";
+import { InstallButton, LightModeButton, PlayButton, SkipButton } from "../components/Button";
 import { Dialog } from "../components/Dialog";
+import { ProgressBar } from "../components/ProgressBar";
+import { formatBytes, getInstallStatus, installGame, type InstallStatus } from "../lib/install";
 import { checkClientLoad } from "../lib/lightmode";
 import { getGameDetails } from "../lib/library";
 import { getAppMetrics } from "../lib/metrics";
 import { errorMessage } from "../lib/tauri";
 import { useAppStore } from "../store/appStore";
 import { useLibrary } from "../store/useLibrary";
-import { PLATFORM_NAMES, type AppMetrics, type Game, type GameDetails, type Platform } from "../types";
+import { PLATFORM_NAMES, type AppMetrics, type Game, type GameDetails, type GameSource, type Platform } from "../types";
 import styles from "./GameDetail.module.css";
 
 const METRICS_INTERVAL_MS = 2000;
@@ -48,6 +50,115 @@ function useGameDetails(game: Game | undefined) {
   return state?.id === gameId ? state : null;
 }
 
+const INSTALL_POLL_MS = 2000;
+const FOCUS_REFRESH_MS = 30_000;
+
+/**
+ * Instalación desde la ficha. Steam: se sigue la descarga leyendo su appmanifest
+ * y, al terminar, se vuelve a sincronizar la biblioteca (JUGAR aparece solo).
+ * Epic y GOG no exponen el progreso: se re-sincroniza al volver a LPhoton.
+ */
+function useInstall(source: GameSource | undefined, needsInstall: boolean) {
+  const refreshLibrary = useAppStore((s) => s.refreshLibrary);
+  const [requested, setRequested] = useState(false);
+  const [status, setStatus] = useState<InstallStatus | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const isSteam = source?.platform === "steam";
+  const externalId = source?.externalId;
+
+  // Steam: se consulta al abrir la ficha (puede haber una descarga en curso) y
+  // cada 2 s mientras haya una descarga pedida o en curso.
+  useEffect(() => {
+    if (!needsInstall || !isSteam || !externalId) return;
+    let alive = true;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const tick = async () => {
+      const next = await getInstallStatus(externalId).catch(() => null);
+      if (!alive) return;
+      setStatus(next);
+      if (next?.state === "installed") {
+        void refreshLibrary();
+        return;
+      }
+      if (requested || (next && next.state !== "none")) timer = setTimeout(tick, INSTALL_POLL_MS);
+    };
+    void tick();
+    return () => {
+      alive = false;
+      clearTimeout(timer);
+    };
+  }, [needsInstall, isSteam, externalId, requested, refreshLibrary]);
+
+  // Epic y GOG: al volver a la ventana se revisa si ya se instaló.
+  useEffect(() => {
+    if (!needsInstall || isSteam || !requested) return;
+    let last = 0;
+    const onFocus = () => {
+      if (Date.now() - last < FOCUS_REFRESH_MS) return;
+      last = Date.now();
+      void refreshLibrary();
+    };
+    window.addEventListener("focus", onFocus);
+    return () => window.removeEventListener("focus", onFocus);
+  }, [needsInstall, isSteam, requested, refreshLibrary]);
+
+  const install = async () => {
+    if (!source) return;
+    setError(null);
+    try {
+      await installGame(source);
+      setRequested(true);
+    } catch (err) {
+      setError(errorMessage(err));
+    }
+  };
+
+  return { install, requested, status, error };
+}
+
+function InstallInfo({
+  platform,
+  requested,
+  status,
+  error,
+}: {
+  platform: Platform;
+  requested: boolean;
+  status: InstallStatus | null;
+  error: string | null;
+}) {
+  const name = PLATFORM_NAMES[platform];
+  if (error) return <p className={styles.installError} role="alert">{error}</p>;
+  if (status?.state === "downloading") {
+    const value = status.totalBytes > 0 ? status.downloadedBytes / status.totalBytes : 0;
+    return (
+      <div className={styles.install}>
+        <p className={styles.installText}>
+          Descargando en {name}: {Math.floor(value * 100)} % · {formatBytes(status.downloadedBytes)} de{" "}
+          {formatBytes(status.totalBytes)}
+        </p>
+        <ProgressBar value={value} label="Progreso de la descarga" />
+      </div>
+    );
+  }
+  if (status?.state === "queued") {
+    return <p className={styles.installText}>En cola en {name}. La descarga empezará en breve.</p>;
+  }
+  if (status?.state === "installed") {
+    return <p className={styles.installText}>¡Listo! Actualizando tu biblioteca…</p>;
+  }
+  if (requested) {
+    return (
+      <p className={styles.installText}>
+        {platform === "steam"
+          ? "Se abrió Steam: elige la carpeta y confirma en su ventana. El progreso aparecerá aquí."
+          : `Se abrió ${name}: confirma la instalación allí. Cuando termine, el juego aparecerá como instalado.`}
+      </p>
+    );
+  }
+  return <p className={styles.installText}>No está instalado. Se instalará con {name}.</p>;
+}
+
 /** Ficha del juego — maqueta 02 (+ diálogo de la maqueta 03). */
 export function GameDetail() {
   const { id } = useParams();
@@ -66,6 +177,8 @@ export function GameDetail() {
   const source = game?.sources.find((s) => s.installed && entry?.platforms.includes(s.platform)) ??
     game?.sources.find((s) => entry?.platforms.includes(s.platform));
   const platform = source?.platform;
+  const needsInstall = !!source && !source.installed;
+  const installer = useInstall(source, needsInstall);
   const detailsState = useGameDetails(game);
   const details = detailsState?.details;
 
@@ -156,8 +269,26 @@ export function GameDetail() {
             />
           )}
           <div className={styles.info}>
-            <PlayButton onClick={onPlay} disabled={!platform || checking} className={styles.play} />
+            {needsInstall ? (
+              <InstallButton
+                onClick={() => void installer.install()}
+                disabled={installer.status?.state === "downloading" || installer.status?.state === "queued"}
+                className={styles.play}
+              >
+                {installer.status?.state === "downloading" ? "Descargando" : "Instalar"}
+              </InstallButton>
+            ) : (
+              <PlayButton onClick={onPlay} disabled={!platform || checking} className={styles.play} />
+            )}
             <div className={styles.text}>
+              {needsInstall && platform && (
+                <InstallInfo
+                  platform={platform}
+                  requested={installer.requested}
+                  status={installer.status}
+                  error={installer.error}
+                />
+              )}
               <h1 className="visually-hidden">{game.title}</h1>
               <p className={styles.description}>
                 {details?.description ??

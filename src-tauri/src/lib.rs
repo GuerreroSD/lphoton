@@ -142,6 +142,8 @@ pub fn run() {
             commands::add_fix,
             commands::vote_fix,
             commands::delete_fix,
+            commands::install_game,
+            commands::install_status,
             commands::get_autostart,
             commands::set_autostart,
             commands::install_paths,

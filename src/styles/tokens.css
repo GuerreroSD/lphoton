@@ -92,7 +92,7 @@
   /* Tamaños por rol */
   --fs-display: 75px; /* Display – Faster One */
   --fs-logo-lg: 56px; /* Logo en la pantalla de carga */
-  --fs-logo-nav: 36px; /* Logo dentro de la caja de la navbar */
+  --fs-logo-nav: clamp(30px, 2.8vw, 46px); /* Logo de la navbar: crece con la ventana */
   --fs-title: 24px; /* Título – Chakra Petch 700 */
   --fs-title-sm: 18px; /* Títulos de diálogos y estados */
   --fs-nav: 14px; /* Botones de navegación (mayúsculas, menor que el título) */
