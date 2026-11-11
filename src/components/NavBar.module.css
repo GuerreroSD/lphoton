@@ -1,0 +1,22 @@
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(var(--space-4), 3.4vw, var(--space-7));
+  height: var(--navbar-height);
+  padding: 0 var(--space-6);
+  background: var(--surface-navbar);
+  flex: none;
+}
+
+.items {
+  display: flex;
+  align-items: center;
+  gap: clamp(var(--space-3), 2.6vw, var(--space-7));
+}
+
+.logoLink {
+  display: inline-flex;
+  border-radius: var(--radius-md);
+  text-decoration: none;
+}

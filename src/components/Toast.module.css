@@ -1,0 +1,28 @@
+.toast {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--surface-container);
+  font-size: var(--fs-body-sm);
+  line-height: var(--lh-body);
+}
+
+.success {
+  color: var(--color-success);
+  box-shadow: inset 0 0 0 1px var(--color-success);
+}
+
+/* Rosado sobre neutral oscuro: 4.21:1 (excepción aprobada, igual que "Omitir"). */
+.error {
+  color: var(--color-alert);
+  box-shadow: inset 0 0 0 1px var(--color-alert);
+}
+
+.info {
+  color: var(--color-accent);
+  box-shadow: inset 0 0 0 1px var(--border-subtle);
+}
+
+.toast a {
+  color: inherit;
+  font-weight: var(--weight-label);
+}

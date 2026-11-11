@@ -1,0 +1,34 @@
+[package]
+name = "lphoton"
+version = "0.1.0"
+description = "LPhoton: launcher liviano que unifica Steam, Epic Games y GOG"
+authors = ["Luis Barrios Urbina", "Alan Troncoso Jara"]
+edition = "2021"
+rust-version = "1.77.2"
+
+[lib]
+# El sufijo _lib evita choques de nombre con el binario en Windows.
+name = "lphoton_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+# Fases siguientes (ver LPHOTON.md §3):
+# rusqlite = { version = "0.32", features = ["bundled"] }   # caché (fase 2)
+# keyring = "3"                                             # credenciales (fase 2)
+# sysinfo = "0.32"                                          # métricas (fases 4 y 6)
+# [target.'cfg(windows)'.dependencies]
+# windows = { version = "0.58", features = ["Win32_System_Threading", "Win32_System_ProcessStatus"] }
+
+[profile.release]
+codegen-units = 1
+lto = true
+opt-level = "s"
+panic = "abort"
+strip = true

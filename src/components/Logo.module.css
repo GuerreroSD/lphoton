@@ -1,0 +1,48 @@
+.logo {
+  display: inline-block;
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: var(--weight-display);
+  line-height: 1;
+  white-space: nowrap;
+  /* Degradado horizontal (§5.3): celeste→rosado→morado en fondo oscuro. */
+  background-image: var(--logo-gradient);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  /* Faster One se inclina: un poco de aire evita que se corte la última letra. */
+  padding-right: 0.08em;
+}
+
+.onLight {
+  background-image: var(--logo-gradient-on-light);
+}
+
+.nav {
+  font-size: var(--fs-logo-nav);
+}
+
+.lg {
+  font-size: var(--fs-logo-lg);
+}
+
+.display {
+  font-size: var(--fs-display);
+}
+
+/* Caja oscura de la navbar */
+.box {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 64px;
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--logo-box-bg);
+  text-decoration: none;
+}
+
+.boxLg {
+  height: 88px;
+  padding: 0 var(--space-6);
+}

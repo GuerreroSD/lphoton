@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="900" viewBox="0 0 600 900">
+  <defs>
+    <linearGradient id="bg-resident-evil-hd-remaster" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4A1550"/>
+      <stop offset="0.55" stop-color="#2D1B36"/>
+      <stop offset="1" stop-color="#120a17"/>
+    </linearGradient>
+    <radialGradient id="g1-resident-evil-hd-remaster" cx="0.3" cy="0.3" r="0.55">
+      <stop offset="0" stop-color="#00F0FF" stop-opacity="0.75"/>
+      <stop offset="1" stop-color="#00F0FF" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="g2-resident-evil-hd-remaster" cx="0.8" cy="0.75" r="0.5">
+      <stop offset="0" stop-color="#B636C7" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#B636C7" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="lines-resident-evil-hd-remaster" width="600" height="14" patternUnits="userSpaceOnUse">
+      <rect width="600" height="1" fill="#ffffff" opacity="0.04"/>
+    </pattern>
+  </defs>
+  <rect width="600" height="900" fill="url(#bg-resident-evil-hd-remaster)"/>
+  <rect width="600" height="900" fill="url(#g1-resident-evil-hd-remaster)"/>
+  <rect width="600" height="900" fill="url(#g2-resident-evil-hd-remaster)"/>
+  <rect width="600" height="900" fill="url(#lines-resident-evil-hd-remaster)"/>
+  <rect x="44" y="584" width="64" height="6" fill="#FF007F"/>
+  <text x="44" y="640" font-family="Chakra Petch, Bahnschrift, Arial Narrow, sans-serif" font-weight="700" font-size="54" fill="#DBC5DD" letter-spacing="2">RESIDENT EVIL</text>
+  <text x="44" y="716" font-family="Chakra Petch, Bahnschrift, Arial Narrow, sans-serif" font-weight="700" font-size="64" fill="#00F0FF" letter-spacing="2">HD REMASTER</text>
+  <text x="44" y="830" font-family="Montserrat, Segoe UI, sans-serif" font-weight="600" font-size="22" fill="#DBC5DD" opacity="0.8">2015 · PORTADA DE MUESTRA</text>
+</svg>

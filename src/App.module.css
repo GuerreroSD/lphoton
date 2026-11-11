@@ -1,0 +1,12 @@
+.shell {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* position: relative para que el diálogo desenfoque solo el contenido, no la navbar. */
+.main {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+}

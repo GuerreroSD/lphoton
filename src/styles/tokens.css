@@ -1,0 +1,155 @@
+/*
+ * LPhoton – Design tokens (LPHOTON.md §5 + docs/guia-de-estilos.pdf).
+ * Única fuente de colores, tipografías, tamaños, radios y sombras.
+ * Los componentes NO deben usar hex sueltos: solo var(--…).
+ */
+
+:root {
+  /* ── 5.1 Paleta base (valores de la guía) ───────────────────────── */
+  --palette-primary: #b636c7; /* Morado velocidad */
+  --palette-accent: #00f0ff; /* Celeste luz */
+  --palette-alert: #ff007f; /* Rosado señal */
+  --palette-success: #00e676; /* Verde éxito */
+  --palette-deep: #4a1550; /* Morado intenso */
+  --palette-neutral-light: #dbc5dd; /* Neutral claro */
+  --palette-neutral-dark: #2d1b36; /* Neutral oscuro */
+  --palette-navbar: #af89c5; /* Lavanda barra superior (tomado de maquetas, confirmar con diseño) */
+
+  /* Canales RGB para transparencias: rgb(var(--x-rgb) / 0.5) */
+  --palette-primary-rgb: 182 54 199;
+  --palette-accent-rgb: 0 240 255;
+  --palette-alert-rgb: 255 0 127;
+  --palette-success-rgb: 0 230 118;
+  --palette-deep-rgb: 74 21 80;
+  --palette-neutral-light-rgb: 219 197 221;
+  --palette-neutral-dark-rgb: 45 27 54;
+  --palette-navbar-rgb: 175 137 197;
+  --palette-black-rgb: 0 0 0;
+
+  /* ── Tokens semánticos (LPHOTON.md §5.1) ────────────────────────── */
+  --color-primary: var(--palette-primary);
+  --color-accent: var(--palette-accent);
+  --color-alert: var(--palette-alert);
+  --color-success: var(--palette-success);
+  --color-deep: var(--palette-deep);
+  --color-bg-light: var(--palette-neutral-light);
+  --color-bg-dark: var(--palette-neutral-dark);
+  --color-navbar: var(--palette-navbar);
+
+  --color-primary-rgb: var(--palette-primary-rgb);
+  --color-accent-rgb: var(--palette-accent-rgb);
+  --color-alert-rgb: var(--palette-alert-rgb);
+  --color-success-rgb: var(--palette-success-rgb);
+  --color-deep-rgb: var(--palette-deep-rgb);
+  --color-bg-dark-rgb: var(--palette-neutral-dark-rgb);
+  --color-bg-light-rgb: var(--palette-neutral-light-rgb);
+
+  /* ── Roles de superficie y texto (cambian con el tema) ─────────── */
+  --surface-app: var(--color-bg-dark); /* fondo de pantallas */
+  --surface-container: var(--color-bg-dark); /* botones, paneles, modales */
+  --surface-sunken: rgb(var(--palette-black-rgb) / 0.18); /* campos de texto */
+  --surface-navbar: var(--color-navbar);
+  --surface-chip: var(--color-navbar); /* tarjeta lavanda de la pantalla de carga */
+  --surface-dev: var(--color-bg-light); /* fondo de la página de componentes (maqueta 00) */
+  --text-strong: var(--color-accent); /* texto principal sobre fondos oscuros (11.28:1) */
+  --text-on-chip: var(--color-deep); /* texto sobre lavanda (4.76:1) */
+  --text-on-primary: var(--color-bg-dark); /* texto del botón JUGAR (3.28:1, excepción aprobada) */
+  --border-container: var(--color-accent);
+  --border-subtle: rgb(var(--color-accent-rgb) / 0.35);
+  --divider: rgb(var(--palette-navbar-rgb) / 0.35);
+  --platform-icon: var(--color-bg-light);
+  --cover-placeholder: rgb(var(--palette-navbar-rgb) / 0.12);
+
+  /* Estado "deshabilitado / seleccionado" (maqueta 00) */
+  --state-disabled-bg: rgb(var(--palette-neutral-dark-rgb) / 0.4);
+  --state-disabled-text: rgb(var(--palette-accent-rgb) / 0.62);
+  --state-disabled-opacity: 0.5;
+
+  /* Logo: degradado según el fondo (§5.3) */
+  --logo-gradient: linear-gradient(
+    90deg,
+    var(--color-accent) 0%,
+    var(--color-alert) 58%,
+    var(--color-primary) 100%
+  );
+  --logo-gradient-on-light: linear-gradient(90deg, var(--color-primary) 0%, var(--color-alert) 100%);
+  --logo-box-bg: var(--color-bg-dark);
+
+  /* Pantalla de carga: luces de fondo (§6.5) */
+  --glow-accent: rgb(var(--palette-accent-rgb) / 0.78);
+  --glow-alert: rgb(var(--palette-alert-rgb) / 0.72);
+
+  /* ── 5.2 Tipografías ────────────────────────────────────────────── */
+  --font-display: "Faster One", system-ui, sans-serif;
+  --font-title: "Chakra Petch", "Segoe UI", system-ui, sans-serif;
+  --font-body: "Montserrat", "Segoe UI", system-ui, sans-serif;
+
+  --weight-display: 400;
+  --weight-title: 700;
+  --weight-body: 400;
+  --weight-label: 600;
+
+  /* Tamaños por rol */
+  --fs-display: 75px; /* Display – Faster One */
+  --fs-logo-lg: 56px; /* Logo en la pantalla de carga */
+  --fs-logo-nav: 36px; /* Logo dentro de la caja de la navbar */
+  --fs-title: 24px; /* Título – Chakra Petch 700 */
+  --fs-title-sm: 18px; /* Títulos de diálogos y estados */
+  --fs-nav: 14px; /* Botones de navegación (mayúsculas, menor que el título) */
+  --fs-body: 16px; /* Cuerpo – Montserrat 400 */
+  --fs-body-sm: 14px; /* Cuerpo compacto (diálogos, tarjetas) */
+  --fs-label: 12px; /* Etiqueta – Montserrat 600 */
+
+  --lh-body: 1.45;
+  --lh-tight: 1.2;
+  --tracking-caps: 0.04em;
+
+  /* ── Radios ─────────────────────────────────────────────────────── */
+  --radius-sm: 4px;
+  --radius-md: 8px; /* botones */
+  --radius-lg: 12px; /* contenedores, modales */
+  --radius-pill: 999px;
+
+  /* ── Sombras (estados hover) ────────────────────────────────────── */
+  --shadow-nav-hover: 2px 3px 0 0 var(--color-accent), 2px 3px 8px 0 rgb(var(--color-accent-rgb) / 0.35);
+  --shadow-play-hover: 3px 4px 0 0 rgb(var(--color-bg-dark-rgb) / 0.95);
+  --shadow-skip-hover: 2px 3px 0 0 rgb(var(--color-alert-rgb) / 0.55), 0 0 10px 0 rgb(var(--color-alert-rgb) / 0.35);
+  --shadow-light-hover: 2px 3px 0 0 rgb(var(--color-accent-rgb) / 0.55), 0 0 10px 0 rgb(var(--color-success-rgb) / 0.35);
+  --shadow-search-hover: 0 0 14px 0 rgb(var(--color-accent-rgb) / 0.55);
+  --shadow-cover-focus: 0 0 0 2px var(--color-accent);
+  --shadow-card-success: 0 4px 14px 0 rgb(var(--color-success-rgb) / 0.18);
+  --shadow-modal: 0 10px 30px 0 rgb(var(--palette-black-rgb) / 0.45);
+
+  /* ── Movimiento (≤150 ms; solo transform, opacity, box-shadow) ─── */
+  --duration-fast: 120ms;
+  --duration-base: 150ms;
+  --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
+
+  /* ── Espaciado y layout ─────────────────────────────────────────── */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+
+  --navbar-height: 96px;
+  --sidebar-width: 340px;
+  --cover-width: 176px;
+  --blur-backdrop: 4px;
+
+  color-scheme: dark;
+}
+
+/* Modo claro: se intercambian los tokens (§5.1). Las maquetas usan el oscuro (predeterminado). */
+:root[data-theme="light"] {
+  --surface-app: var(--color-bg-light);
+  --text-strong: var(--color-deep);
+  --border-container: var(--color-primary);
+  --border-subtle: rgb(var(--color-deep-rgb) / 0.35);
+  --divider: rgb(var(--color-deep-rgb) / 0.25);
+  --logo-gradient: var(--logo-gradient-on-light);
+  color-scheme: light;
+}

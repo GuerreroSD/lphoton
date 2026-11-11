@@ -1,0 +1,43 @@
+/* Fuentes incluidas en el bundle (SIL OFL 1.1). Sin dependencia de Google Fonts. */
+@font-face {
+  font-family: "Faster One";
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url("../assets/fonts/FasterOne-Regular.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Chakra Petch";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("../assets/fonts/ChakraPetch-Regular.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Chakra Petch";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("../assets/fonts/ChakraPetch-Bold.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Montserrat";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("../assets/fonts/Montserrat-400.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Montserrat";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("../assets/fonts/Montserrat-600.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Montserrat";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("../assets/fonts/Montserrat-700.woff2") format("woff2");
+}

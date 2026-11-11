@@ -1,0 +1,97 @@
+.page {
+  height: 100%;
+  padding: var(--space-7) var(--space-6);
+  overflow-y: auto;
+}
+
+.frame {
+  width: min(960px, 100%);
+  margin: 0 auto;
+}
+
+/* Etiqueta de métricas: Montserrat 600, 12 px, celeste, arriba a la derecha. */
+.metrics {
+  margin: 0 0 var(--space-2);
+  text-align: right;
+  color: var(--color-accent);
+  font-weight: var(--weight-label);
+  font-size: var(--fs-label);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Contenedor centrado con borde celeste fino. */
+.card {
+  border: 1px solid var(--border-container);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.hero {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1600 / 620;
+  object-fit: cover;
+  background: var(--cover-placeholder);
+}
+
+.info {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) minmax(200px, 240px);
+  gap: var(--space-5);
+  align-items: start;
+  padding: var(--space-3) var(--space-5) var(--space-5);
+}
+
+.play {
+  margin-top: var(--space-1);
+}
+
+.text {
+  min-width: 0;
+}
+
+/* Cuerpo: Montserrat 16 px, celeste, truncado con "…". */
+.description {
+  margin: 0;
+  color: var(--color-accent);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  overflow: hidden;
+}
+
+/* Metadatos: Montserrat 600, 12 px, en viñetas. */
+.meta {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--color-accent);
+  font-weight: var(--weight-label);
+  font-size: var(--fs-label);
+  line-height: 1.5;
+}
+
+.meta li::before {
+  content: "· ";
+}
+
+.missing {
+  text-align: center;
+  color: var(--color-accent);
+}
+
+.missing a {
+  color: inherit;
+}
+
+@media (max-width: 900px) {
+  .info {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+  .meta {
+    grid-column: 2;
+  }
+}

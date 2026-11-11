@@ -1,0 +1,154 @@
+/*
+ * Fondo Neutral oscuro con 4 manchas de luz difusas (2 celestes, 2 rosadas) hechas con
+ * gradientes radiales: sin imágenes ni animaciones costosas (§6.5).
+ */
+.screen {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 52% 8%, var(--glow-accent) 0, transparent 22%),
+    radial-gradient(circle at 19% 50%, var(--glow-alert) 0, transparent 22%),
+    radial-gradient(circle at 85% 54%, var(--glow-accent) 0, transparent 23%),
+    radial-gradient(circle at 50% 96%, var(--glow-alert) 0, transparent 22%),
+    var(--color-bg-dark);
+}
+
+/* Etiquetas de 12 px en las esquinas superiores */
+.corner {
+  position: absolute;
+  top: var(--space-5);
+  margin: 0;
+  color: var(--color-accent);
+  font-weight: var(--weight-label);
+  font-size: var(--fs-label);
+}
+
+.topLeft {
+  left: var(--space-6);
+}
+
+.topRight {
+  right: var(--space-6);
+}
+
+.center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-bottom: var(--space-7);
+}
+
+.logo {
+  margin: 0 0 var(--space-7);
+  font-weight: inherit;
+}
+
+.status {
+  margin: 0 0 var(--space-4);
+  color: var(--color-accent);
+  font-family: var(--font-title);
+  font-weight: var(--weight-title);
+  font-size: var(--fs-title-sm);
+}
+
+.bar {
+  width: min(400px, 60vw);
+}
+
+.after {
+  margin-top: var(--space-5);
+  transition: opacity var(--duration-base) var(--ease-out);
+}
+
+/* Tarjeta lavanda abajo a la izquierda */
+.gameCard {
+  position: absolute;
+  left: var(--space-6);
+  bottom: var(--space-5);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  max-width: 300px;
+  padding: var(--space-1) var(--space-3) var(--space-1) var(--space-1);
+  border-radius: var(--radius-md);
+  background: var(--surface-chip);
+}
+
+.thumb {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  object-fit: cover;
+  object-position: top;
+}
+
+.gameText {
+  min-width: 0;
+}
+
+.gameName {
+  margin: 0;
+  color: var(--text-on-chip);
+  font-size: var(--fs-body-sm);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.gameFrom {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  color: var(--text-on-chip);
+  font-weight: var(--weight-label);
+  font-size: var(--fs-label);
+}
+
+.platformChip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: var(--radius-pill);
+  background: var(--color-bg-dark);
+  color: var(--platform-icon);
+}
+
+.platformChip svg {
+  width: 15px;
+  height: 15px;
+}
+
+/* Tarjeta con borde verde abajo a la derecha */
+.lightCard {
+  position: absolute;
+  right: var(--space-6);
+  bottom: var(--space-5);
+  width: 300px;
+  padding: var(--space-5) var(--space-5);
+  border: 1px solid var(--color-success);
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-dark);
+  box-shadow: var(--shadow-card-success);
+  transition: opacity var(--duration-base) var(--ease-out);
+}
+
+.lightTitle {
+  margin: 0 0 var(--space-3);
+  color: var(--color-success);
+  font-size: var(--fs-body-sm);
+}
+
+.lightText {
+  margin: 0;
+  color: var(--color-success);
+  font-weight: var(--weight-label);
+  font-size: var(--fs-label);
+}

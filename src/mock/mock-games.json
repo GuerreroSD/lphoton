@@ -1,0 +1,199 @@
+[
+  {
+    "id": "resident-evil-1996",
+    "title": "Resident Evil (1996)",
+    "sources": [
+      { "platform": "gog", "externalId": "mock-gog-re1", "installed": false, "playtimeMinutes": 410, "lastPlayed": "2025-10-31T22:10:00Z" }
+    ],
+    "genre": "Acción / Survival Horror",
+    "developer": "CAPCOM Co., Ltd.",
+    "protagonist": "Chris Redfield / Jill Valentine",
+    "releaseYear": 1996,
+    "description": "El clásico que dio origen al survival horror: los agentes de S.T.A.R.S. quedan atrapados en una mansión aislada en las afueras de Raccoon City, rodeados de criaturas creadas por la corporación Umbrella.",
+    "coverUrl": "/placeholders/resident-evil-1996-cover.svg",
+    "heroUrl": "/placeholders/resident-evil-1996-hero.svg"
+  },
+  {
+    "id": "resident-evil-hd-remaster",
+    "title": "Resident Evil HD Remaster",
+    "sources": [
+      { "platform": "steam", "externalId": "304240", "installed": true, "playtimeMinutes": 1260, "lastPlayed": "2026-11-02T20:00:00Z" }
+    ],
+    "genre": "Acción / Survival Horror",
+    "developer": "CAPCOM Co., Ltd.",
+    "protagonist": "Chris Redfield / Jill Valentine",
+    "releaseYear": 2015,
+    "description": "La versión remasterizada del remake de 2002: gráficos en alta definición, controles modernos y la misma tensión de recorrer la mansión Spencer con recursos limitados.",
+    "coverUrl": "/placeholders/resident-evil-hd-remaster-cover.svg",
+    "heroUrl": "/placeholders/resident-evil-hd-remaster-hero.svg"
+  },
+  {
+    "id": "resident-evil-0-hd-remaster",
+    "title": "Resident Evil 0 HD Remaster",
+    "sources": [
+      { "platform": "steam", "externalId": "339340", "installed": false, "playtimeMinutes": 640, "lastPlayed": "2025-06-14T18:30:00Z" }
+    ],
+    "genre": "Acción / Survival Horror",
+    "developer": "CAPCOM Co., Ltd.",
+    "protagonist": "Rebecca Chambers / Billy Coen",
+    "releaseYear": 2016,
+    "description": "La precuela de la saga: la novata Rebecca Chambers y el exconvicto Billy Coen unen fuerzas a bordo de un tren infestado, alternando entre ambos personajes para sobrevivir.",
+    "coverUrl": "/placeholders/resident-evil-0-hd-remaster-cover.svg",
+    "heroUrl": "/placeholders/resident-evil-0-hd-remaster-hero.svg"
+  },
+  {
+    "id": "resident-evil-2-2019",
+    "title": "Resident Evil 2 (2019)",
+    "sources": [
+      { "platform": "steam", "externalId": "883710", "installed": true, "playtimeMinutes": 2380, "lastPlayed": "2026-11-07T23:15:00Z" }
+    ],
+    "genre": "Acción / Survival Horror",
+    "developer": "CAPCOM Co., Ltd.",
+    "protagonist": "Leon S. Kennedy / Claire Redfield",
+    "releaseYear": 2019,
+    "description": "Remake del clásico de 1998: el policía novato Leon S. Kennedy y la estudiante Claire Redfield intentan escapar de una Raccoon City devastada por un brote viral.",
+    "coverUrl": "/placeholders/resident-evil-2-2019-cover.svg",
+    "heroUrl": "/placeholders/resident-evil-2-2019-hero.svg"
+  },
+  {
+    "id": "resident-evil-3-2020",
+    "title": "Resident Evil 3 (2020)",
+    "sources": [
+      { "platform": "steam", "externalId": "952060", "installed": true, "playtimeMinutes": 720, "lastPlayed": "2026-09-21T21:40:00Z" }
+    ],
+    "genre": "Acción / Survival Horror",
+    "developer": "CAPCOM Co., Ltd.",
+    "protagonist": "Jill Valentine",
+    "releaseYear": 2020,
+    "description": "Jill Valentine intenta huir de Raccoon City mientras es perseguida sin descanso por Némesis, un arma biológica creada para eliminar a los últimos miembros de S.T.A.R.S.",
+    "coverUrl": "/placeholders/resident-evil-3-2020-cover.svg",
+    "heroUrl": "/placeholders/resident-evil-3-2020-hero.svg"
+  },
+  {
+    "id": "resident-evil-4-2005",
+    "title": "Resident Evil 4 (2005)",
+    "sources": [
+      { "platform": "steam", "externalId": "254700", "installed": false, "playtimeMinutes": 1940, "lastPlayed": "2024-12-28T19:00:00Z" }
+    ],
+    "genre": "Acción / Survival Horror",
+    "developer": "CAPCOM Co., Ltd.",
+    "protagonist": "Leon S. Kennedy",
+    "releaseYear": 2005,
+    "description": "Leon S. Kennedy viaja a una remota aldea europea para rescatar a Ashley Graham, la hija del presidente de los Estados Unidos, secuestrada por un misterioso culto.",
+    "coverUrl": "/placeholders/resident-evil-4-2005-cover.svg",
+    "heroUrl": "/placeholders/resident-evil-4-2005-hero.svg"
+  },
+  {
+    "id": "resident-evil-4-2023",
+    "title": "Resident Evil 4 (2023)",
+    "sources": [
+      { "platform": "steam", "externalId": "2050650", "installed": true, "playtimeMinutes": 3110, "lastPlayed": "2026-11-10T22:30:00Z" }
+    ],
+    "genre": "Acción / Survival Horror",
+    "developer": "CAPCOM Co., Ltd.",
+    "protagonist": "Leon S. Kennedy",
+    "releaseYear": 2023,
+    "description": "Resident Evil 4 es un juego de acción y survival horror donde controlas al agente Leon S. Kennedy en su misión para rescatar a Ashley Graham, la hija del presidente de los Estados Unidos, en una remota y peligrosa aldea europea.",
+    "coverUrl": "/placeholders/resident-evil-4-2023-cover.svg",
+    "heroUrl": "/placeholders/resident-evil-4-2023-hero.svg"
+  },
+  {
+    "id": "resident-evil-5",
+    "title": "Resident Evil 5",
+    "sources": [
+      { "platform": "steam", "externalId": "21690", "installed": false, "playtimeMinutes": 1500, "lastPlayed": "2025-02-09T17:45:00Z" }
+    ],
+    "genre": "Acción / Survival Horror",
+    "developer": "CAPCOM Co., Ltd.",
+    "protagonist": "Chris Redfield / Sheva Alomar",
+    "releaseYear": 2009,
+    "description": "Chris Redfield y Sheva Alomar investigan un brote bioterrorista en África, en una aventura cooperativa que enfrenta a ambos agentes con el pasado de Umbrella.",
+    "coverUrl": "/placeholders/resident-evil-5-cover.svg",
+    "heroUrl": "/placeholders/resident-evil-5-hero.svg"
+  },
+  {
+    "id": "resident-evil-6",
+    "title": "Resident Evil 6",
+    "sources": [
+      { "platform": "steam", "externalId": "221040", "installed": true, "playtimeMinutes": 1320, "lastPlayed": "2026-10-30T20:20:00Z" }
+    ],
+    "genre": "Acción / Survival Horror",
+    "developer": "CAPCOM Co., Ltd.",
+    "protagonist": "Leon S. Kennedy / Chris Redfield / Jake Muller",
+    "releaseYear": 2012,
+    "description": "Cuatro campañas entrelazadas siguen a Leon, Chris, Jake y Ada a través de un ataque bioterrorista de escala mundial, de Norteamérica a China.",
+    "coverUrl": "/placeholders/resident-evil-6-cover.svg",
+    "heroUrl": "/placeholders/resident-evil-6-hero.svg"
+  },
+  {
+    "id": "resident-evil-7-biohazard",
+    "title": "Resident Evil 7: Biohazard",
+    "sources": [
+      { "platform": "steam", "externalId": "418370", "installed": true, "playtimeMinutes": 980, "lastPlayed": "2026-08-15T23:50:00Z" }
+    ],
+    "genre": "Acción / Survival Horror",
+    "developer": "CAPCOM Co., Ltd.",
+    "protagonist": "Ethan Winters",
+    "releaseYear": 2017,
+    "description": "En primera persona, Ethan Winters busca a su esposa desaparecida en una plantación abandonada de Luisiana y termina atrapado por la perturbadora familia Baker.",
+    "coverUrl": "/placeholders/resident-evil-7-biohazard-cover.svg",
+    "heroUrl": "/placeholders/resident-evil-7-biohazard-hero.svg"
+  },
+  {
+    "id": "resident-evil-village",
+    "title": "Resident Evil Village",
+    "sources": [
+      { "platform": "steam", "externalId": "1196590", "installed": true, "playtimeMinutes": 1150, "lastPlayed": "2026-10-25T21:05:00Z" }
+    ],
+    "genre": "Acción / Survival Horror",
+    "developer": "CAPCOM Co., Ltd.",
+    "protagonist": "Ethan Winters",
+    "releaseYear": 2021,
+    "description": "Años después de los sucesos de Luisiana, Ethan Winters llega a una aldea de Europa del Este dominada por criaturas y por la enigmática Madre Miranda para recuperar a su hija.",
+    "coverUrl": "/placeholders/resident-evil-village-cover.svg",
+    "heroUrl": "/placeholders/resident-evil-village-hero.svg"
+  },
+  {
+    "id": "resident-evil-requiem",
+    "title": "Resident Evil Requiem",
+    "sources": [
+      { "platform": "epic", "externalId": "mock-epic-requiem", "installed": false, "playtimeMinutes": 0, "lastPlayed": null },
+      { "platform": "steam", "externalId": "3764200", "installed": true, "playtimeMinutes": 860, "lastPlayed": "2026-11-09T21:00:00Z" }
+    ],
+    "genre": "Acción / Survival Horror",
+    "developer": "CAPCOM Co., Ltd.",
+    "protagonist": "Grace Ashcroft / Leon S. Kennedy",
+    "releaseYear": 2026,
+    "description": "Resident Evil Requiem es un juego de acción y survival horror donde controlas a la analista del FBI Grace Ashcroft y al veterano agente Leon S. Kennedy en su regreso a las ruinas de Raccoon City para destapar una nueva conspiración bioterrorista que amenaza con repetir la tragedia.",
+    "coverUrl": "/placeholders/resident-evil-requiem-cover.svg",
+    "heroUrl": "/placeholders/resident-evil-requiem-hero.svg"
+  },
+  {
+    "id": "resident-evil-revelations",
+    "title": "Resident Evil Revelations",
+    "sources": [
+      { "platform": "steam", "externalId": "222480", "installed": false, "playtimeMinutes": 540, "lastPlayed": "2025-04-03T16:20:00Z" }
+    ],
+    "genre": "Acción / Survival Horror",
+    "developer": "CAPCOM Co., Ltd.",
+    "protagonist": "Jill Valentine / Chris Redfield",
+    "releaseYear": 2013,
+    "description": "Jill Valentine explora un crucero a la deriva en el Mediterráneo, el Queen Zenobia, mientras sigue la pista de una organización bioterrorista y de un nuevo virus.",
+    "coverUrl": "/placeholders/resident-evil-revelations-cover.svg",
+    "heroUrl": "/placeholders/resident-evil-revelations-hero.svg"
+  },
+  {
+    "id": "resident-evil-revelations-2",
+    "title": "Resident Evil Revelations 2",
+    "sources": [
+      { "platform": "steam", "externalId": "287290", "installed": false, "playtimeMinutes": 610, "lastPlayed": "2025-08-22T19:10:00Z" }
+    ],
+    "genre": "Acción / Survival Horror",
+    "developer": "CAPCOM Co., Ltd.",
+    "protagonist": "Claire Redfield / Moira Burton",
+    "releaseYear": 2015,
+    "description": "Claire Redfield y Moira Burton despiertan prisioneras en una isla desconocida y deben cooperar para escapar, mientras Barry Burton llega más tarde en busca de su hija.",
+    "coverUrl": "/placeholders/resident-evil-revelations-2-cover.svg",
+    "heroUrl": "/placeholders/resident-evil-revelations-2-hero.svg"
+  }
+]

@@ -1,0 +1,28 @@
+.item {
+  display: grid;
+  grid-template-columns: minmax(0, 204px) auto;
+  align-items: center;
+  column-gap: var(--space-4);
+  min-height: 38px;
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-sm);
+  color: var(--color-accent);
+  text-decoration: none;
+  transition: box-shadow var(--duration-base) var(--ease-out);
+}
+
+.item:hover,
+.item:focus-visible {
+  outline: none;
+  box-shadow: inset 2px 0 0 var(--color-accent);
+}
+
+.title {
+  font-family: var(--font-body);
+  font-weight: var(--weight-label);
+  font-size: var(--fs-label);
+  line-height: var(--lh-tight);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
