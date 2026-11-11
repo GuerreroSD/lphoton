@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
+import { BackGlyph } from "../assets/icons/icons";
 import { LightModeButton, PlayButton, SkipButton } from "../components/Button";
 import { Dialog } from "../components/Dialog";
 import { checkClientLoad } from "../lib/lightmode";
@@ -92,6 +93,23 @@ export function GameDetail() {
 
   const dismissDialog = useCallback(() => setAskPlatform(null), []);
 
+  // Volver a donde estaba el usuario (normalmente la biblioteca, con su búsqueda y filtros).
+  const goBack = useCallback(() => {
+    const canGoBack = (window.history.state as { idx?: number } | null)?.idx ?? 0;
+    if (canGoBack > 0) navigate(-1);
+    else navigate("/biblioteca");
+  }, [navigate]);
+
+  // Esc también vuelve, salvo con el diálogo abierto (ahí Esc solo cierra el diálogo).
+  useEffect(() => {
+    if (askPlatform) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") goBack();
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [askPlatform, goBack]);
+
   if (!game) {
     return (
       <div className={styles.page}>
@@ -111,10 +129,16 @@ export function GameDetail() {
   return (
     <div className={styles.page}>
       <div className={styles.frame} aria-hidden={askPlatform ? true : undefined}>
-        <p className={styles.metrics} aria-label="Consumo de LPhoton">
-          CPU: {metrics ? `${metrics.cpuPercent.toFixed(1)}%` : "—"} | RAM: {metrics ? `${metrics.ramMb} MB` : "—"} |
-          PLATAFORMA: {platform ? PLATFORM_NAMES[platform].toUpperCase() : "—"}
-        </p>
+        <div className={styles.topBar}>
+          <button type="button" className={styles.back} onClick={goBack} title="Volver (Esc)">
+            <BackGlyph className={styles.backIcon} />
+            Volver
+          </button>
+          <p className={styles.metrics} aria-label="Consumo de LPhoton">
+            CPU: {metrics ? `${metrics.cpuPercent.toFixed(1)}%` : "—"} | RAM: {metrics ? `${metrics.ramMb} MB` : "—"} |
+            PLATAFORMA: {platform ? PLATFORM_NAMES[platform].toUpperCase() : "—"}
+          </p>
+        </div>
         <article className={styles.card}>
           {failedHero === game.heroUrl || !game.heroUrl ? (
             <div className={styles.heroFallback} aria-hidden="true">

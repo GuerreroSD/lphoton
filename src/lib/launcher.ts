@@ -1,17 +1,25 @@
 // Wrapper de la ejecución intervenida (RF2, §7.2) y su progreso (pantalla 6.5).
-// Fase 2: el lanzamiento es real (Steam en modo silencioso + steam://rungameid).
-// Los pasos de progreso siguen simulados hasta la fase 4, cuando launcher.rs
-// emitirá el evento `launch-progress` (se escuchará con `listen()`).
-// La firma (callback + función para cancelar) se mantiene igual.
+// En la app de escritorio el progreso es real: launcher.rs vigila los procesos y
+// emite `launch-progress`, `launch-done` y `launch-error`.
+// En el navegador (modo demo) los pasos se simulan con temporizadores.
 
+import { listen, type UnlistenFn } from "@tauri-apps/api/event";
 import type { LaunchProgress, LaunchStep, Platform } from "../types";
 import { errorMessage, inTauri, invoke } from "./tauri";
 
 export interface LaunchOptions {
   gameId: string;
+  title: string;
   platform: Platform;
   externalId: string;
   lightMode: boolean;
+}
+
+export interface LaunchHandlers {
+  onProgress: (p: LaunchProgress) => void;
+  /** "playing": el juego está abierto (LPhoton pasa a la bandeja). "handoff": sigue en el cliente. */
+  onDone: (outcome: "playing" | "handoff", message: string | null) => void;
+  onError: (message: string) => void;
 }
 
 export const LAUNCH_STEP_LABELS: Record<LaunchStep, string> = {
@@ -21,49 +29,67 @@ export const LAUNCH_STEP_LABELS: Record<LaunchStep, string> = {
   "light-mode-applied": "Modo ligero aplicado",
 };
 
-const STEP_DELAY_MS = 900;
-
 // Evita lanzar dos veces el mismo juego si la pantalla se monta de nuevo
 // (React StrictMode en desarrollo, o volver atrás y adelante enseguida).
 const RELAUNCH_GUARD_MS = 5000;
 let lastLaunch: { key: string; at: number; result: Promise<unknown> } | null = null;
 
-/**
- * Inicia el juego y notifica cada paso. Si el lanzamiento falla se llama a
- * `onError` y se detiene el progreso. Devuelve una función para cancelar
- * la suscripción (al desmontar la pantalla de carga).
- */
-export function launchGame(
-  options: LaunchOptions,
-  onProgress: (p: LaunchProgress) => void,
-  onError: (message: string) => void,
-): () => void {
-  let cancelled = false;
-  const steps: LaunchStep[] = ["client-started", "license-validated", "game-detected"];
-  if (options.lightMode) steps.push("light-mode-applied");
+interface ProgressPayload {
+  gameId: string;
+  step: LaunchStep;
+  progress: number;
+  detail: string | null;
+}
 
-  const timers = steps.map((step, i) =>
-    setTimeout(() => !cancelled && onProgress({ step, progress: (i + 1) / steps.length }), STEP_DELAY_MS * (i + 1)),
-  );
-  const stop = () => {
-    cancelled = true;
-    timers.forEach(clearTimeout);
-  };
+/** Inicia el juego y notifica cada paso. Devuelve una función para dejar de escuchar. */
+export function launchGame(options: LaunchOptions, handlers: LaunchHandlers): () => void {
+  return inTauri ? launchReal(options, handlers) : launchSimulated(options, handlers);
+}
+
+function launchReal(options: LaunchOptions, handlers: LaunchHandlers): () => void {
+  let cancelled = false;
+  const mine = (gameId: string) => !cancelled && gameId === options.gameId;
+
+  const unlisteners: Promise<UnlistenFn>[] = [
+    listen<ProgressPayload>("launch-progress", ({ payload }) => {
+      if (mine(payload.gameId)) handlers.onProgress({ step: payload.step, progress: payload.progress, detail: payload.detail });
+    }),
+    listen<{ gameId: string; outcome: "playing" | "handoff"; message: string | null }>("launch-done", ({ payload }) => {
+      if (mine(payload.gameId)) handlers.onDone(payload.outcome, payload.message);
+    }),
+    listen<{ gameId: string; message: string }>("launch-error", ({ payload }) => {
+      if (mine(payload.gameId)) handlers.onError(payload.message);
+    }),
+  ];
 
   const key = `${options.platform}:${options.externalId}`;
   const now = Date.now();
-  const recentlyLaunched = lastLaunch?.key === key && now - lastLaunch.at < RELAUNCH_GUARD_MS;
-  if (inTauri) {
-    if (!lastLaunch || !recentlyLaunched) {
-      const result = invoke("launch_game", { platform: options.platform, externalId: options.externalId });
-      lastLaunch = { key, at: now, result };
-    }
-    // Si la pantalla se montó dos veces, la segunda también recibe el error del único lanzamiento.
-    lastLaunch.result.catch((err) => {
-      if (cancelled) return;
-      stop();
-      onError(errorMessage(err, "No pudimos iniciar el juego."));
-    });
+  if (!lastLaunch || lastLaunch.key !== key || now - lastLaunch.at >= RELAUNCH_GUARD_MS) {
+    // Se lanza recién cuando los listeners están listos, para no perder eventos.
+    const result = Promise.all(unlisteners).then(() => invoke("launch_game", { request: options }));
+    lastLaunch = { key, at: now, result };
   }
-  return stop;
+  lastLaunch.result.catch((err) => {
+    if (!cancelled) handlers.onError(errorMessage(err, "No pudimos iniciar el juego."));
+  });
+
+  return () => {
+    cancelled = true;
+    unlisteners.forEach((p) => void p.then((unlisten) => unlisten()));
+  };
+}
+
+const STEP_DELAY_MS = 900;
+
+function launchSimulated(options: LaunchOptions, handlers: LaunchHandlers): () => void {
+  const steps: LaunchStep[] = ["client-started", "license-validated", "game-detected"];
+  if (options.lightMode) steps.push("light-mode-applied");
+  const timers = steps.map((step, i) =>
+    setTimeout(() => {
+      const detail = step === "light-mode-applied" ? "Se liberaron 450 MB de RAM para mejorar tus FPS." : null;
+      handlers.onProgress({ step, progress: (i + 1) / steps.length, detail });
+      if (i === steps.length - 1) handlers.onDone("playing", null);
+    }, STEP_DELAY_MS * (i + 1)),
+  );
+  return () => timers.forEach(clearTimeout);
 }

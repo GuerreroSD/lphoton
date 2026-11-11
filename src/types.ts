@@ -64,6 +64,8 @@ export interface AppMetrics {
 
 export interface ClientLoad {
   platform: Platform;
+  /** El cliente nativo está abierto. */
+  running: boolean;
   /** true si el cliente nativo consume muchos recursos en segundo plano. */
   high: boolean;
   ramMb: number;
@@ -75,6 +77,8 @@ export interface LaunchProgress {
   step: LaunchStep;
   /** 0..1 */
   progress: number;
+  /** Texto opcional del backend (p. ej. "Se liberaron 450 MB de RAM…"). */
+  detail?: string | null;
 }
 
 export type LightModePreference = "ask" | "always" | "never";

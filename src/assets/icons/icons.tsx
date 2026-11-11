@@ -47,6 +47,14 @@ export function PlayGlyph(props: IconProps) {
   );
 }
 
+export function BackGlyph(props: IconProps) {
+  return (
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.2" aria-hidden="true" focusable="false" {...props}>
+      <path d="M10 3L5 8l5 5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
 export function CheckGlyph(props: IconProps) {
   return (
     <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.2" aria-hidden="true" focusable="false" {...props}>

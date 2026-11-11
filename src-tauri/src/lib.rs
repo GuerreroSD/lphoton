@@ -10,13 +10,16 @@ mod lightmode;
 mod metrics;
 mod models;
 mod platform;
+mod processes;
+mod tray;
 
 use std::io::Write;
 use std::path::PathBuf;
-use std::sync::Arc;
+use std::sync::atomic::{AtomicBool, AtomicU64};
+use std::sync::{Arc, Mutex};
 use std::time::{Instant, SystemTime, UNIX_EPOCH};
 
-use tauri::Manager;
+use tauri::{Manager, RunEvent};
 
 /// Estado compartido. Se clona barato (todo va detrás de `Arc`).
 #[derive(Clone)]
@@ -32,6 +35,25 @@ pub struct Inner {
     pub steam_root: Option<PathBuf>,
     pub started: Instant,
     pub sync_lock: tauri::async_runtime::Mutex<()>,
+    /// Juego en curso (uno a la vez) y lo que el modo ligero modificó.
+    pub session: Mutex<Option<Session>>,
+    /// Cambia en cada lanzamiento o cierre: el hilo vigilante viejo se detiene.
+    pub generation: AtomicU64,
+    pub metrics_sys: Mutex<sysinfo::System>,
+    /// `startup_ms` se mide una sola vez por proceso (no al reabrir la ventana).
+    pub startup_reported: AtomicBool,
+}
+
+pub struct Session {
+    pub generation: u64,
+    pub title: String,
+    pub adjusted: Vec<lightmode::Adjusted>,
+}
+
+impl AppState {
+    pub fn session_active(&self) -> bool {
+        self.session.lock().map(|s| s.is_some()).unwrap_or(false)
+    }
 }
 
 impl std::ops::Deref for AppState {
@@ -55,6 +77,9 @@ pub fn run() {
     let started = Instant::now();
 
     tauri::Builder::default()
+        // Debe ir primero: si LPhoton ya está abierto (o en la bandeja), se
+        // muestra esa ventana en vez de abrir una segunda copia.
+        .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| tray::show_main_window(app)))
         .plugin(tauri_plugin_opener::init())
         .register_asynchronous_uri_scheme_protocol("cover", covers::handle)
         .setup(move |app| {
@@ -75,8 +100,16 @@ pub fn run() {
                     steam_root: library::steam::steam_root(),
                     started,
                     sync_lock: tauri::async_runtime::Mutex::new(()),
+                    session: Mutex::new(None),
+                    generation: AtomicU64::new(0),
+                    metrics_sys: Mutex::new(sysinfo::System::new()),
+                    startup_reported: AtomicBool::new(false),
                 }),
             };
+            tray::ensure(app.handle(), "LPhoton");
+            // Restaurar en segundo plano lo que haya quedado de un cierre inesperado.
+            let recovery = state.clone();
+            std::thread::spawn(move || launcher::recover_pending(&recovery));
             log_line(&state, &format!("setup_ms={}", started.elapsed().as_millis()));
             app.manage(state);
             Ok(())
@@ -92,7 +125,23 @@ pub fn run() {
             commands::clear_steam_api_key,
             commands::launch_game,
             commands::report_startup,
+            commands::check_client_load,
+            commands::get_app_metrics,
+            commands::get_lightmode_targets,
+            commands::set_lightmode_targets,
         ])
-        .run(tauri::generate_context!())
-        .expect("error al iniciar LPhoton");
+        .build(tauri::generate_context!())
+        .expect("error al iniciar LPhoton")
+        .run(|app, event| match event {
+            // Se cerró la ventana: LPhoton sigue en la bandeja (como Steam).
+            // Para salir del todo: clic derecho en el ícono → "Salir".
+            RunEvent::ExitRequested { code: None, api, .. } => {
+                api.prevent_exit();
+                let tooltip = if app.state::<AppState>().session_active() { "LPhoton · juego en curso" } else { "LPhoton" };
+                tray::ensure(app, tooltip);
+            }
+            // Cierre definitivo: nunca dejar procesos con la prioridad cambiada.
+            RunEvent::Exit => launcher::end_session(&app.state::<AppState>(), "cierre de LPhoton"),
+            _ => {}
+        });
 }

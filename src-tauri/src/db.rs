@@ -92,6 +92,47 @@ impl Db {
             .and_then(|(json, _)| serde_json::from_str(&json).ok()))
     }
 
+    pub fn get_meta(&self, key: &str) -> Option<String> {
+        self.conn()
+            .query_row("SELECT value FROM meta WHERE key = ?1", params![key], |r| r.get(0))
+            .optional()
+            .ok()
+            .flatten()
+    }
+
+    pub fn set_meta(&self, key: &str, value: &str) -> rusqlite::Result<()> {
+        self.conn().execute(
+            "INSERT INTO meta (key, value) VALUES (?1, ?2)
+             ON CONFLICT(key) DO UPDATE SET value = excluded.value",
+            params![key, value],
+        )?;
+        Ok(())
+    }
+
+    /// Procesos modificados por el modo ligero que aún no se restauran. Se guardan
+    /// para poder restaurarlos aunque LPhoton se cierre de golpe.
+    pub fn save_pending_lightmode(&self, adjusted: &[crate::lightmode::Adjusted]) {
+        let json = serde_json::to_string(adjusted).unwrap_or_else(|_| "[]".into());
+        let _ = self.set_meta("lightmode_pending", &json);
+    }
+
+    pub fn take_pending_lightmode(&self) -> Vec<crate::lightmode::Adjusted> {
+        let pending = self
+            .get_meta("lightmode_pending")
+            .and_then(|json| serde_json::from_str(&json).ok())
+            .unwrap_or_default();
+        let _ = self.set_meta("lightmode_pending", "[]");
+        pending
+    }
+
+    /// Procesos objetivo del modo ligero (configurables; por defecto los webhelpers).
+    pub fn lightmode_targets(&self) -> Vec<String> {
+        self.get_meta("lightmode_targets")
+            .and_then(|json| serde_json::from_str::<Vec<String>>(&json).ok())
+            .filter(|list| !list.is_empty())
+            .unwrap_or_else(|| crate::lightmode::DEFAULT_TARGETS.iter().map(|s| s.to_string()).collect())
+    }
+
     pub fn save_details(&self, id: &str, details: &GameDetails) -> rusqlite::Result<()> {
         let json = serde_json::to_string(details).unwrap_or_default();
         self.conn().execute(

@@ -28,6 +28,8 @@ struct Manifest {
     app_categories: Vec<String>,
     #[serde(default, rename = "bIsIncompleteInstall")]
     is_incomplete_install: bool,
+    #[serde(default)]
+    install_location: String,
 }
 
 #[derive(Debug, Clone)]
@@ -37,6 +39,7 @@ pub struct EpicApp {
     pub item_id: String,
     pub title: String,
     pub installed: bool,
+    pub install_location: PathBuf,
 }
 
 impl EpicApp {
@@ -76,6 +79,7 @@ fn manifest_to_app(m: Manifest) -> Option<EpicApp> {
         item_id: m.catalog_item_id,
         title: m.display_name,
         installed: !m.is_incomplete_install,
+        install_location: PathBuf::from(m.install_location),
     })
 }
 
@@ -94,6 +98,16 @@ pub fn build_games(apps: &[EpicApp]) -> Vec<Game> {
             }],
         })
         .collect()
+}
+
+/// Carpeta de instalación del juego cuyo `external_id` es `ns:item:app`.
+pub fn install_dir(external_id: &str) -> Option<PathBuf> {
+    let app_name = external_id.rsplit(':').next()?;
+    installed_apps(&manifests_dir()?)
+        .into_iter()
+        .find(|a| a.app_name == app_name)
+        .map(|a| a.install_location)
+        .filter(|p| p.is_dir())
 }
 
 /// URI de lanzamiento silencioso. `external_id` = `ns:item:app`.

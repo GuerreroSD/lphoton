@@ -1,5 +1,43 @@
 # Changelog
 
+## [0.4.0] – 2026-11-11 · Fase 4: ejecución intervenida, modo ligero y bandeja
+
+### Backend (Rust)
+- **Progreso real del lanzamiento** (`launcher.rs`): un hilo vigila los procesos con `sysinfo` y emite `launch-progress`:
+  1. *client-started*: `steam.exe` / `EpicGamesLauncher.exe` está abierto (GOG no lo necesita).
+  2. *license-validated*: aparece un proceso dentro de la carpeta de instalación del juego.
+  3. *game-detected*: sigue vivo 3 s (si era un lanzador intermedio, como EasyAntiCheat, espera el proceso definitivo).
+  4. *light-mode-applied*: con los MB liberados.
+  También emite `launch-done` (*playing* o *handoff*, cuando el juego no está instalado y el cliente se hace cargo) y `launch-error` con mensajes claros.
+- **Modo ligero real** (`lightmode.rs`, `platform/windows.rs`): `SetPriorityClass(IDLE)` + `EmptyWorkingSet` sobre los procesos auxiliares (`steamwebhelper.exe`, `EpicWebHelper.exe`, `GalaxyClient Helper.exe`, `GalaxyCommunication.exe`). La lista es configurable (SQLite, `lightmode_targets`).
+  - **Nunca** se tocan `steam.exe`, `EpicGamesLauncher.exe`, `GalaxyClient.exe` ni LPhoton, aunque se agreguen a la lista.
+  - Cada 30 s se aplica a webhelpers nuevos. Al cerrarse el juego (5 s sin procesos) **se restaura la prioridad original**, comprobando pid y hora de inicio para no tocar un proceso que reutilizó el mismo pid.
+  - **Recuperación ante cierres inesperados**: los procesos modificados se guardan en SQLite y, si LPhoton se cierra de golpe, se restauran al volver a abrirlo.
+- **Diálogo "¿Optimizar RAM?" con medición real** (`check_client_load`): suma la RAM del cliente y sus auxiliares; aparece desde 300 MB.
+- **Bandeja del sistema** (`tray.rs`): el ícono está siempre presente, como en Steam.
+  - Al empezar a jugar, la ventana se **destruye** (libera el WebView2) y LPhoton queda en la bandeja. Lo mismo al cerrar la ventana con la X.
+  - Clic en el ícono o en "Abrir LPhoton": se recrea la ventana. "Salir" restaura el modo ligero y cierra.
+- **Instancia única** (`tauri-plugin-single-instance`): abrir LPhoton de nuevo muestra la ventana existente.
+- **Métricas reales** en la ficha (`get_app_metrics`): CPU y RAM de LPhoton más sus procesos WebView2.
+- Se registran en `lphoton.log`: `lightmode_applied`, `ram_playing_mb`, `session_end` y `lightmode_recovered`. `startup_ms` se mide una sola vez por proceso.
+- **Instalador de Windows** (NSIS, por usuario, en español, sin permisos de administrador): `npm run tauri build`.
+
+### Frontend
+- La pantalla de carga sigue los eventos reales y muestra *"Se liberaron N MB de RAM para mejorar tus FPS."* (tono de la guía), los errores, o *"Continúa en Steam…"* si el juego no está instalado.
+- **Botón "‹ Volver"** en la ficha del juego (y tecla Esc). Vuelve a la biblioteca con su búsqueda y filtros.
+
+### Mediciones (equipo real)
+- **RF3 – Modo ligero**: *God of War Ragnarök* (Steam): 10 procesos ajustados, 0 fallos, **762 MB liberados**. En la prueba manual (`real_lightmode`), 10 procesos ajustados, 348 MB liberados y los 10 restaurados a su prioridad original (verificado uno por uno).
+- **RNF6 – Bajo consumo**: con LPhoton en la bandeja y el juego abierto, **42 MB** (*Dead by Daylight*) y **45 MB** (*God of War Ragnarök*). Meta: < 100 MB. Sin procesos WebView2 hijos mientras se juega.
+- **RNF7 – Arranque**: 344–1433 ms en modo desarrollo (meta: < 4000 ms).
+
+### Verificación
+- `cargo test` ✔ (24 + 4 manuales: Steam, Epic, API de GOG, modo ligero real) · `npx tsc -b` ✔ · `npm run lint` ✔.
+- Prueba de punta a punta por el usuario: Dead by Daylight (sin modo ligero) y God of War Ragnarök (con modo ligero).
+
+### Incidente corregido
+- Durante las pruebas, `tauri dev` reinició LPhoton por un cambio de código mientras se jugaba, y los webhelpers quedaron en prioridad *Idle*. Se restauraron manualmente y, para que no vuelva a pasar, se agregó la recuperación desde SQLite al arrancar.
+
 ## [0.3.0] – 2026-11-11 · Fase 3: Epic, GOG y fusión
 
 ### Backend (Rust)

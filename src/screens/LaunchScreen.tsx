@@ -25,19 +25,37 @@ export function LaunchScreen() {
 
   const [progress, setProgress] = useState<LaunchProgress | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const done = progress?.progress === 1;
-  const lightApplied = lightMode && progress?.step === "light-mode-applied";
+  const [outcome, setOutcome] = useState<{ kind: "playing" | "handoff"; message: string | null } | null>(null);
+  const [lightDetail, setLightDetail] = useState<string | null>(null);
+  const done = outcome !== null;
+  const lightApplied = lightMode && lightDetail !== null;
 
   const externalId = game?.sources.find((s) => s.platform === platform)?.externalId;
+  const title = game?.title ?? "";
 
   useEffect(() => {
     if (!externalId) return;
     setProgress(null);
     setError(null);
-    return launchGame({ gameId: id, platform, externalId, lightMode }, setProgress, setError);
-  }, [id, platform, externalId, lightMode]);
+    setOutcome(null);
+    setLightDetail(null);
+    return launchGame(
+      { gameId: id, title, platform, externalId, lightMode },
+      {
+        onProgress: (p) => {
+          setProgress(p);
+          if (p.step === "light-mode-applied") setLightDetail(p.detail ?? "Procesos en segundo plano suspendidos");
+        },
+        onDone: (kind, message) => {
+          setOutcome({ kind, message });
+          setProgress((p) => ({ step: p?.step ?? "game-detected", progress: 1, detail: p?.detail }));
+        },
+        onError: setError,
+      },
+    );
+  }, [id, title, platform, externalId, lightMode]);
 
-  // Fase 4: al tomar foco el juego, LPhoton se minimiza a la bandeja. Aquí, Esc vuelve a la ficha.
+  // Al abrirse el juego, LPhoton pasa a la bandeja (la ventana se cierra sola). Esc vuelve a la ficha.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && navigate(`/juego/${id}`);
     document.addEventListener("keydown", onKey);
@@ -56,7 +74,12 @@ export function LaunchScreen() {
           <Logo size="lg" />
         </h1>
         <p className={styles.status} role={error ? "alert" : undefined}>
-          {error ?? (done ? "juego iniciado" : "inicializando juego")}
+          {error ??
+            (outcome?.kind === "handoff"
+              ? outcome.message
+              : done
+                ? "juego iniciado · LPhoton pasará a la bandeja"
+                : "inicializando juego")}
         </p>
         <div className={styles.bar}>
           <ProgressBar value={progress?.progress ?? 0.04} label="Progreso de inicio del juego" />
@@ -87,7 +110,7 @@ export function LaunchScreen() {
       {lightMode && (
         <div className={styles.lightCard} style={{ opacity: lightApplied ? 1 : 0.55 }}>
           <p className={styles.lightTitle}>{lightApplied ? "Modo ligero activado" : "Activando modo ligero…"}</p>
-          <p className={styles.lightText}>Procesos en segundo plano suspendidos</p>
+          <p className={styles.lightText}>{lightDetail ?? "Procesos en segundo plano suspendidos"}</p>
         </div>
       )}
     </main>

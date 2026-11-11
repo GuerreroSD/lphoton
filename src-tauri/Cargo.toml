@@ -1,6 +1,6 @@
 [package]
 name = "lphoton"
-version = "0.1.0"
+version = "0.4.0"
 description = "LPhoton: launcher liviano que unifica Steam, Epic Games y GOG"
 authors = ["Luis Barrios Urbina", "Alan Troncoso Jara"]
 edition = "2021"
@@ -15,8 +15,10 @@ crate-type = ["staticlib", "cdylib", "rlib"]
 tauri-build = { version = "2", features = [] }
 
 [dependencies]
-tauri = { version = "2", features = [] }
+tauri = { version = "2", features = ["tray-icon"] }
 tauri-plugin-opener = "2"
+# Una sola instancia: abrir LPhoton de nuevo muestra la ventana existente
+tauri-plugin-single-instance = "2"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 # Caché local de la biblioteca (RNF7)
@@ -25,13 +27,14 @@ rusqlite = { version = "0.32", features = ["bundled"] }
 keyring = { version = "3", features = ["windows-native"] }
 # Steam Web API, appdetails y portadas del CDN (TLS nativo de Windows: schannel)
 reqwest = { version = "0.12", default-features = false, features = ["json", "native-tls"] }
+# Procesos, CPU y RAM (modo ligero, detección del juego, métricas)
+sysinfo = { version = "0.37", default-features = false, features = ["system"] }
 
 [target.'cfg(windows)'.dependencies]
 winreg = "0.55"
+# Win32: SetPriorityClass, EmptyWorkingSet (modo ligero, RF3)
+windows = { version = "0.61", features = ["Win32_Foundation", "Win32_System_Threading", "Win32_System_ProcessStatus"] }
 
-# Fases siguientes (ver LPHOTON.md §3):
-# sysinfo = "0.32"                                          # métricas (fases 4 y 6)
-# windows = { version = "0.58", features = ["Win32_System_Threading", "Win32_System_ProcessStatus"] }
 
 [profile.release]
 codegen-units = 1

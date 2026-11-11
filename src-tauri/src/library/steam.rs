@@ -197,6 +197,17 @@ pub fn installed_apps(root: &Path) -> Vec<LocalApp> {
     apps.into_values().collect()
 }
 
+/// Carpeta de instalación de un juego: `<biblioteca>/steamapps/common/<installdir>`.
+pub fn install_dir(root: &Path, appid: u32) -> Option<PathBuf> {
+    library_folders(root).into_iter().find_map(|folder| {
+        let steamapps = folder.join("steamapps");
+        let doc = read_vdf(&steamapps.join(format!("appmanifest_{appid}.acf")))?;
+        let dir = doc.get("AppState")?.str_at("installdir")?;
+        let path = steamapps.join("common").join(dir);
+        path.is_dir().then_some(path)
+    })
+}
+
 /// Horas jugadas y última sesión por AppID desde `userdata/<id>/config/localconfig.vdf`.
 pub fn local_playtime(root: &Path, steam_id: u64) -> HashMap<u32, LocalPlaytime> {
     let mut out = HashMap::new();

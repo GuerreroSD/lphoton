@@ -1,11 +1,14 @@
 //! Comandos expuestos al frontend (`invoke`). Ver `src/lib/*.ts`.
 
 use serde::Serialize;
-use tauri::State;
+use tauri::{AppHandle, State};
 
 use crate::library::{self, gog, steam, PlatformsStatus, SyncResult};
 use crate::models::{Game, GameDetails, Platform};
-use crate::{credentials, launcher, AppState};
+use crate::launcher::LaunchRequest;
+use crate::lightmode::{self, ClientLoad};
+use crate::metrics::{self, AppMetrics};
+use crate::{credentials, launcher, processes, AppState};
 
 fn blocking<T: Send + 'static>(f: impl FnOnce() -> T + Send + 'static) -> impl std::future::Future<Output = Result<T, String>> {
     async move { tauri::async_runtime::spawn_blocking(f).await.map_err(|e| e.to_string()) }
@@ -134,17 +137,56 @@ pub async fn clear_steam_api_key() -> Result<(), String> {
     blocking(credentials::clear_steam_api_key).await?
 }
 
+/// Lanza el juego y vigila su ciclo de vida. El progreso llega por los eventos
+/// `launch-progress`, `launch-done` y `launch-error`.
 #[tauri::command]
-pub async fn launch_game(state: State<'_, AppState>, platform: Platform, external_id: String) -> Result<(), String> {
+pub async fn launch_game(app: AppHandle, state: State<'_, AppState>, request: LaunchRequest) -> Result<(), String> {
     let state = state.inner().clone();
-    blocking(move || launcher::launch(&state, platform, &external_id)).await?
+    blocking(move || launcher::start(&app, &state, request)).await?
+}
+
+/// Consumo actual del cliente nativo (para decidir si mostrar "¿Optimizar RAM?").
+#[tauri::command]
+pub async fn check_client_load(platform: Platform) -> Result<ClientLoad, String> {
+    blocking(move || lightmode::client_load(&processes::fresh_snapshot(), platform)).await
+}
+
+/// CPU y RAM de LPhoton (proceso + WebView2).
+#[tauri::command]
+pub async fn get_app_metrics(state: State<'_, AppState>) -> Result<AppMetrics, String> {
+    let state = state.inner().clone();
+    blocking(move || metrics::app_metrics(&state)).await
+}
+
+#[tauri::command]
+pub async fn get_lightmode_targets(state: State<'_, AppState>) -> Result<Vec<String>, String> {
+    let state = state.inner().clone();
+    blocking(move || state.db.lightmode_targets()).await
+}
+
+/// Guarda la lista de procesos del modo ligero. Se ignoran los procesos
+/// principales de los clientes (nunca se modifican).
+#[tauri::command]
+pub async fn set_lightmode_targets(state: State<'_, AppState>, targets: Vec<String>) -> Result<Vec<String>, String> {
+    let clean: Vec<String> = targets
+        .into_iter()
+        .map(|t| t.trim().to_string())
+        .filter(|t| t.to_lowercase().ends_with(".exe") && t.len() <= 64 && !lightmode::is_protected(t))
+        .collect();
+    let state = state.inner().clone();
+    let json = serde_json::to_string(&clean).map_err(|e| e.to_string())?;
+    blocking(move || state.db.set_meta("lightmode_targets", &json)).await?.map_err(|e| e.to_string())?;
+    Ok(clean)
 }
 
 /// El frontend avisa cuando la biblioteca ya está pintada (RNF7).
 /// Se registra `startup_ms` (desde que arrancó el proceso) en el log.
 #[tauri::command]
-pub fn report_startup(state: State<'_, AppState>, games: usize) -> u128 {
+pub fn report_startup(state: State<'_, AppState>, games: usize) -> Option<u128> {
+    if state.startup_reported.swap(true, std::sync::atomic::Ordering::SeqCst) {
+        return None;
+    }
     let ms = state.started.elapsed().as_millis();
     crate::log_line(&state, &format!("startup_ms={ms} games={games}"));
-    ms
+    Some(ms)
 }
