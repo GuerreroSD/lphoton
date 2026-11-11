@@ -1,6 +1,6 @@
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 import { NavLink } from "react-router-dom";
-import { CheckGlyph, PlatformIcon, PlayGlyph, SearchGlyph } from "../assets/icons/icons";
+import { CheckGlyph, DownloadGlyph, PlatformIcon, PlayGlyph, SearchGlyph } from "../assets/icons/icons";
 import { PLATFORM_NAMES, type Platform } from "../types";
 import styles from "./Button.module.css";
 
@@ -56,6 +56,16 @@ export function PlayButton({ previewState, className, children = "Jugar", ...res
   return (
     <button type="button" className={cx(styles.base, styles.play, previewClass(previewState), className)} {...rest}>
       <PlayGlyph className={styles.icon} />
+      <span>{children}</span>
+    </button>
+  );
+}
+
+/** INSTALAR: mismo estilo que JUGAR, para juegos que no están instalados. */
+export function InstallButton({ previewState, className, children = "Instalar", ...rest }: BaseProps) {
+  return (
+    <button type="button" className={cx(styles.base, styles.play, previewClass(previewState), className)} {...rest}>
+      <DownloadGlyph className={styles.icon} />
       <span>{children}</span>
     </button>
   );

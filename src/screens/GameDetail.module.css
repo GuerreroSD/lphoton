@@ -93,6 +93,34 @@
   min-width: 0;
 }
 
+/* Estado de la instalación (sobre la descripción). */
+.install {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+.installText,
+.installError {
+  margin: 0 0 var(--space-3);
+  font-weight: var(--weight-label);
+  font-size: var(--fs-label);
+  line-height: var(--lh-body);
+}
+
+.install .installText {
+  margin: 0;
+}
+
+.installText {
+  color: var(--color-success);
+}
+
+.installError {
+  color: var(--color-alert);
+}
+
 /* Cuerpo: Montserrat 16 px, celeste, truncado con "…". */
 .description {
   margin: 0;

@@ -208,6 +208,43 @@ pub fn install_dir(root: &Path, appid: u32) -> Option<PathBuf> {
     })
 }
 
+/// Estado de descarga de un juego según su `appmanifest_<appid>.acf`.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct InstallStatus {
+    /// `none` (sin manifiesto), `queued`, `downloading` o `installed`.
+    pub state: &'static str,
+    pub downloaded_bytes: u64,
+    pub total_bytes: u64,
+}
+
+pub fn install_status(root: &Path, appid: u32) -> InstallStatus {
+    library_folders(root)
+        .into_iter()
+        .find_map(|folder| read_vdf(&folder.join("steamapps").join(format!("appmanifest_{appid}.acf"))))
+        .map(|doc| install_status_from(&doc))
+        .unwrap_or(InstallStatus { state: "none", ..Default::default() })
+}
+
+fn install_status_from(doc: &Vdf) -> InstallStatus {
+    let Some(state) = doc.get("AppState") else { return InstallStatus { state: "none", ..Default::default() } };
+    let num = |k: &str| state.str_at(k).and_then(|v| v.parse::<u64>().ok()).unwrap_or(0);
+    let flags = num("StateFlags");
+    // Bit 4 = "FullyInstalled" y sin actualización pendiente en curso.
+    if flags & 4 != 0 && num("BytesToDownload") == num("BytesDownloaded") {
+        return InstallStatus { state: "installed", downloaded_bytes: num("SizeOnDisk"), total_bytes: num("SizeOnDisk") };
+    }
+    let total = num("BytesToDownload");
+    let downloaded = num("BytesDownloaded").min(total);
+    InstallStatus { state: if total > 0 { "downloading" } else { "queued" }, downloaded_bytes: downloaded, total_bytes: total }
+}
+
+/// Abre el diálogo de instalación de Steam (`steam://install/<appid>`).
+pub fn install(root: &Path, appid: u32) -> std::io::Result<()> {
+    hidden(std::process::Command::new(steam_exe(root)).arg("--").arg(format!("steam://install/{appid}"))).spawn()?;
+    Ok(())
+}
+
 /// Horas jugadas y última sesión por AppID desde `userdata/<id>/config/localconfig.vdf`.
 pub fn local_playtime(root: &Path, steam_id: u64) -> HashMap<u32, LocalPlaytime> {
     let mut out = HashMap::new();
@@ -467,6 +504,19 @@ fn hidden(cmd: &mut std::process::Command) -> &mut std::process::Command {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn install_status_from_manifest() {
+        let downloading = vdf::parse(r#""AppState" { "appid" "10" "StateFlags" "1026" "BytesToDownload" "1000" "BytesDownloaded" "250" }"#).unwrap();
+        assert_eq!(
+            install_status_from(&downloading),
+            InstallStatus { state: "downloading", downloaded_bytes: 250, total_bytes: 1000 }
+        );
+        let queued = vdf::parse(r#""AppState" { "appid" "10" "StateFlags" "1026" }"#).unwrap();
+        assert_eq!(install_status_from(&queued).state, "queued");
+        let done = vdf::parse(r#""AppState" { "appid" "10" "StateFlags" "4" "SizeOnDisk" "900" "BytesToDownload" "1000" "BytesDownloaded" "1000" }"#).unwrap();
+        assert_eq!(install_status_from(&done).state, "installed");
+    }
 
     #[test]
     fn filters_tools() {

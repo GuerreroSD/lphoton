@@ -112,13 +112,22 @@ pub fn install_dir(external_id: &str) -> Option<PathBuf> {
 
 /// URI de lanzamiento silencioso. `external_id` = `ns:item:app`.
 pub fn launch_uri(external_id: &str) -> Option<String> {
+    app_uri(external_id, "launch&silent=true")
+}
+
+/// URI que abre la instalación del juego en Epic Games Launcher.
+pub fn install_uri(external_id: &str) -> Option<String> {
+    app_uri(external_id, "install")
+}
+
+fn app_uri(external_id: &str, action: &str) -> Option<String> {
     let parts: Vec<&str> = external_id.split(':').collect();
     let valid = |s: &str| !s.is_empty() && s.chars().all(|c| c.is_ascii_alphanumeric() || c == '-' || c == '_' || c == '.');
     if parts.len() != 3 || !parts.iter().all(|p| valid(p)) {
         return None;
     }
     Some(format!(
-        "com.epicgames.launcher://apps/{}%3A{}%3A{}?action=launch&silent=true",
+        "com.epicgames.launcher://apps/{}%3A{}%3A{}?action={action}",
         parts[0], parts[1], parts[2]
     ))
 }
