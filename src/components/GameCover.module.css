@@ -23,3 +23,33 @@
   box-shadow: var(--shadow-cover-focus);
   transform: translateY(-2px);
 }
+
+.fallback {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  width: 100%;
+  height: 100%;
+  padding: var(--space-4);
+  background:
+    radial-gradient(circle at 30% 25%, rgb(var(--color-primary-rgb) / 0.55) 0, transparent 60%),
+    radial-gradient(circle at 80% 80%, rgb(var(--color-accent-rgb) / 0.3) 0, transparent 55%),
+    var(--color-bg-dark);
+}
+
+.fallbackBar {
+  width: 32px;
+  height: 4px;
+  background: var(--color-alert);
+}
+
+.fallbackTitle {
+  color: var(--color-accent);
+  font-family: var(--font-title);
+  font-weight: var(--weight-title);
+  font-size: var(--fs-title-sm);
+  line-height: var(--lh-tight);
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}

@@ -95,3 +95,22 @@
     grid-column: 2;
   }
 }
+
+.heroFallback {
+  display: flex;
+  align-items: flex-end;
+  aspect-ratio: 1600 / 620;
+  padding: var(--space-6);
+  background:
+    radial-gradient(circle at 25% 30%, rgb(var(--color-primary-rgb) / 0.6) 0, transparent 55%),
+    radial-gradient(circle at 85% 70%, rgb(var(--color-accent-rgb) / 0.3) 0, transparent 50%),
+    var(--color-bg-dark);
+}
+
+.heroFallback span {
+  color: var(--color-accent);
+  font-family: var(--font-title);
+  font-weight: var(--weight-title);
+  font-size: var(--fs-title);
+  text-transform: uppercase;
+}

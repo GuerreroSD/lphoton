@@ -24,15 +24,37 @@ export interface Game {
   id: string;
   title: string;
   sources: GameSource[];
-  genre: string;
-  developer: string;
-  protagonist: string;
-  releaseYear: number;
-  description: string;
+  /** Detalles: vienen en los datos simulados; con datos reales se piden aparte (getGameDetails). */
+  genre?: string;
+  developer?: string;
+  protagonist?: string;
+  releaseYear?: number;
+  description?: string;
   /** Portada vertical 2:3 (600×900). */
   coverUrl: string;
   /** Banner horizontal para la ficha. */
   heroUrl: string;
+}
+
+export interface GameDetails {
+  description?: string;
+  genre?: string;
+  developer?: string;
+  protagonist?: string;
+  releaseYear?: number;
+}
+
+export interface SyncResult {
+  games: Game[];
+  /** Aviso no bloqueante (p. ej. falló la Web API y se muestran solo los instalados). */
+  warning: string | null;
+}
+
+export interface SteamStatus {
+  /** Steam está instalado en este equipo. */
+  detected: boolean;
+  steamId: string | null;
+  hasApiKey: boolean;
 }
 
 export interface AppMetrics {

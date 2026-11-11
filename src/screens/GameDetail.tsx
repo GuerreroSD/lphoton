@@ -3,10 +3,12 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { LightModeButton, PlayButton, SkipButton } from "../components/Button";
 import { Dialog } from "../components/Dialog";
 import { checkClientLoad } from "../lib/lightmode";
+import { getGameDetails } from "../lib/library";
 import { getAppMetrics } from "../lib/metrics";
+import { errorMessage } from "../lib/tauri";
 import { useAppStore } from "../store/appStore";
 import { useLibrary } from "../store/useLibrary";
-import { PLATFORM_NAMES, type AppMetrics, type Platform } from "../types";
+import { PLATFORM_NAMES, type AppMetrics, type Game, type GameDetails, type Platform } from "../types";
 import styles from "./GameDetail.module.css";
 
 const METRICS_INTERVAL_MS = 2000;
@@ -26,6 +28,25 @@ function useAppMetrics() {
   return metrics;
 }
 
+/** Detalles de la tienda (con caché en el backend). */
+function useGameDetails(game: Game | undefined) {
+  const [state, setState] = useState<{ id: string; details?: GameDetails; error?: string } | null>(null);
+  const gameId = game?.id;
+  useEffect(() => {
+    if (!game) return;
+    let alive = true;
+    getGameDetails(game)
+      .then((details) => alive && setState({ id: game.id, details }))
+      .catch((err) => alive && setState({ id: game.id, error: errorMessage(err) }));
+    return () => {
+      alive = false;
+    };
+    // Solo se vuelve a pedir si cambia el juego.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [gameId]);
+  return state?.id === gameId ? state : null;
+}
+
 /** Ficha del juego — maqueta 02 (+ diálogo de la maqueta 03). */
 export function GameDetail() {
   const { id } = useParams();
@@ -35,6 +56,8 @@ export function GameDetail() {
   const metrics = useAppMetrics();
   const [askPlatform, setAskPlatform] = useState<Platform | null>(null);
   const [checking, setChecking] = useState(false);
+  // Se guarda la URL que falló para no arrastrar el error a otro juego.
+  const [failedHero, setFailedHero] = useState<string | null>(null);
 
   const entry = entries.find((e) => e.game.id === id);
   const game = entry?.game;
@@ -42,6 +65,8 @@ export function GameDetail() {
   const source = game?.sources.find((s) => s.installed && entry?.platforms.includes(s.platform)) ??
     game?.sources.find((s) => entry?.platforms.includes(s.platform));
   const platform = source?.platform;
+  const detailsState = useGameDetails(game);
+  const details = detailsState?.details;
 
   const launch = useCallback(
     (lightMode: boolean) => {
@@ -91,18 +116,40 @@ export function GameDetail() {
           PLATAFORMA: {platform ? PLATFORM_NAMES[platform].toUpperCase() : "—"}
         </p>
         <article className={styles.card}>
-          <img className={styles.hero} src={game.heroUrl} alt="" decoding="async" width={1600} height={620} />
+          {failedHero === game.heroUrl || !game.heroUrl ? (
+            <div className={styles.heroFallback} aria-hidden="true">
+              <span>{game.title}</span>
+            </div>
+          ) : (
+            <img
+              className={styles.hero}
+              src={game.heroUrl}
+              alt=""
+              decoding="async"
+              width={1600}
+              height={620}
+              onError={() => setFailedHero(game.heroUrl)}
+            />
+          )}
           <div className={styles.info}>
             <PlayButton onClick={onPlay} disabled={!platform || checking} className={styles.play} />
             <div className={styles.text}>
               <h1 className="visually-hidden">{game.title}</h1>
-              <p className={styles.description}>{game.description}</p>
+              <p className={styles.description}>
+                {details?.description ??
+                  (detailsState?.error
+                    ? `${game.title}. ${detailsState.error}`
+                    : detailsState
+                      ? game.title
+                      : "Cargando información…")}
+              </p>
             </div>
             <ul className={styles.meta}>
-              <li>Género: {game.genre}</li>
-              <li>Desarrollador: {game.developer}</li>
-              <li>Protagonista: {game.protagonist}</li>
-              <li>Año de lanzamiento: {game.releaseYear}</li>
+              {details?.genre && <li>Género: {details.genre}</li>}
+              {details?.developer && <li>Desarrollador: {details.developer}</li>}
+              {details?.protagonist && <li>Protagonista: {details.protagonist}</li>}
+              {details?.releaseYear && <li>Año de lanzamiento: {details.releaseYear}</li>}
+              {source && <li>Tiempo jugado: {formatPlaytime(source.playtimeMinutes)}</li>}
             </ul>
           </div>
         </article>
@@ -127,4 +174,10 @@ export function GameDetail() {
       )}
     </div>
   );
+}
+
+function formatPlaytime(minutes: number): string {
+  if (minutes <= 0) return "sin registrar";
+  if (minutes < 60) return `${minutes} min`;
+  return `${Math.round(minutes / 60).toLocaleString("es")} h`;
 }

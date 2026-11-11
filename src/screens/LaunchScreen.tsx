@@ -24,13 +24,18 @@ export function LaunchScreen() {
   const lightMode = params.get("ligero") === "1";
 
   const [progress, setProgress] = useState<LaunchProgress | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const done = progress?.progress === 1;
   const lightApplied = lightMode && progress?.step === "light-mode-applied";
 
+  const externalId = game?.sources.find((s) => s.platform === platform)?.externalId;
+
   useEffect(() => {
+    if (!externalId) return;
     setProgress(null);
-    return launchGame({ gameId: id, platform, lightMode }, setProgress);
-  }, [id, platform, lightMode]);
+    setError(null);
+    return launchGame({ gameId: id, platform, externalId, lightMode }, setProgress, setError);
+  }, [id, platform, externalId, lightMode]);
 
   // Fase 4: al tomar foco el juego, LPhoton se minimiza a la bandeja. Aquí, Esc vuelve a la ficha.
   useEffect(() => {
@@ -50,16 +55,18 @@ export function LaunchScreen() {
         <h1 className={styles.logo}>
           <Logo size="lg" />
         </h1>
-        <p className={styles.status}>{done ? "juego iniciado" : "inicializando juego"}</p>
+        <p className={styles.status} role={error ? "alert" : undefined}>
+          {error ?? (done ? "juego iniciado" : "inicializando juego")}
+        </p>
         <div className={styles.bar}>
           <ProgressBar value={progress?.progress ?? 0.04} label="Progreso de inicio del juego" />
         </div>
         <p className="visually-hidden" aria-live="polite">
           {progress ? LAUNCH_STEP_LABELS[progress.step] : "Iniciando cliente"}
         </p>
-        <div className={styles.after} style={{ opacity: done ? 1 : 0 }} aria-hidden={!done}>
-          <TextButton onClick={() => navigate("/biblioteca")} tabIndex={done ? 0 : -1}>
-            Volver a la biblioteca
+        <div className={styles.after} style={{ opacity: done || error ? 1 : 0 }} aria-hidden={!done && !error}>
+          <TextButton onClick={() => navigate(error ? `/juego/${id}` : "/biblioteca")} tabIndex={done || error ? 0 : -1}>
+            {error ? "Volver a la ficha" : "Volver a la biblioteca"}
           </TextButton>
         </div>
       </div>

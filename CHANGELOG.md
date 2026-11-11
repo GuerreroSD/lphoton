@@ -1,5 +1,41 @@
 # Changelog
 
+## [0.2.0] – 2026-11-11 · Fase 2: Steam
+
+### Backend (Rust)
+- **Detección local sin red** (`library/steam.rs`): ruta de Steam en el registro (`HKCU\Software\Valve\Steam`), todas las bibliotecas de `libraryfolders.vdf`, juegos de `appmanifest_*.acf` (instalado = bit 4 de `StateFlags`) y horas/última sesión de `userdata/<id>/config/localconfig.vdf`. Se filtran redistribuibles, Proton y runtimes.
+- **SteamID64 automático**: se toma de la sesión activa (`ActiveProcess\ActiveUser`) o de `loginusers.vdf`. El usuario no tiene que buscarlo.
+- **Steam Web API opcional** (`GetOwnedGames`): con API key se agregan los juegos no instalados y las horas exactas. Sin key, la app funciona con los instalados.
+- **API key en el administrador de credenciales de Windows** (`credentials.rs`, crate `keyring`). Se valida el formato y se prueba contra la API antes de guardarla. Nunca se escribe en disco ni en localStorage.
+- **Caché SQLite** (`db.rs`, `lphoton.db` en la carpeta de datos de la app): biblioteca y detalles de la tienda (TTL de 30 días).
+- **Detalles del juego** desde `store.steampowered.com/api/appdetails` en español (descripción, género, desarrollador, año), pedidos solo al abrir la ficha.
+- **Protocolo `cover://`** (`covers.rs`) para portadas y banners: caché propia → caché del cliente de Steam (`appcache/librarycache`) → CDN de Steam (y se guarda en disco). Si no hay imagen, el frontend muestra un placeholder con el título.
+- **Lanzamiento real** (`launcher.rs`): `steam.exe -silent` si Steam no está abierto y luego `steam://rungameid/<appid>`, sin ventanas de consola.
+- **Medición de arranque** (RNF7): `setup_ms` y `startup_ms` (hasta que la biblioteca está pintada) se registran en `lphoton.log` (carpeta de logs de la app).
+- Parser propio de VDF (`library/vdf.rs`), `merge.rs` ya integrado en el flujo y modelos serializados en `models.rs`.
+- 11 tests unitarios (`cargo test`) + una prueba manual contra la instalación real (`cargo test real_steam -- --ignored --nocapture`).
+
+### Frontend
+- Los wrappers de `src/lib/` llaman a los comandos de Rust dentro de la app de escritorio. En el navegador (`npm run dev`) siguen usando los datos simulados (modo demo).
+- La biblioteca se pinta primero desde la caché y se sincroniza en segundo plano. Si la Web API falla, se muestra el aviso de la guía: *"Error al sincronizar con Steam… Revisa la solución aquí →"*.
+- Formulario de API key (opcional) en Login y en Configuraciones, con enlace para obtenerla, que se abre en el navegador del sistema (`tauri-plugin-opener`).
+- Epic y GOG aparecen como "Próximamente" en la app de escritorio (fase 3).
+- La ficha carga sus detalles desde la tienda y agrega "Tiempo jugado". Las líneas sin datos (p. ej. "Protagonista", que Steam no entrega) se ocultan.
+- La pantalla de carga muestra el error si Steam no se pudo abrir, y se evita lanzar el juego dos veces si la pantalla se vuelve a montar.
+
+### Mediciones
+- **RNF7 – Arranque**: `startup_ms=1071` con 31 juegos (meta: < 4000 ms), en modo desarrollo (`tauri dev`, sin optimizar).
+
+### Verificación
+- `cargo test` ✔ (11) · `npx tsc -b` ✔ · `npm run lint` ✔ · `npm run build` ✔.
+- Probado contra la instalación real de Steam: 3 bibliotecas, 31 juegos, SteamID detectado, portadas reales y detalles en español.
+
+### Pendiente / limitaciones conocidas
+- Algunos juegos recientes no tienen `library_600x900.jpg` en la ruta pública del CDN (Steam ahora usa URLs con hash): muestran el placeholder si el cliente de Steam tampoco las tiene en caché.
+- Steam no distingue en los manifiestos entre juegos y aplicaciones (p. ej. *Wallpaper Engine*, *Lossless Scaling* aparecen en la biblioteca). Se podría filtrar con el campo `type` de `appdetails` u ofrecer "ocultar juego".
+- Los pasos de progreso de la pantalla de carga siguen simulados (eventos reales en la fase 4).
+- La prueba con API key no se hizo en esta sesión (requiere tu key); la ruta sin key está verificada.
+
 ## [0.1.0] – 2026-11-11 · Fases 0 y 1
 
 ### Fase 0 – Base

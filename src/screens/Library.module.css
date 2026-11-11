@@ -73,3 +73,14 @@
   color: var(--color-accent);
   font-size: var(--fs-body-sm);
 }
+
+.status {
+  margin-top: var(--space-5);
+}
+
+.syncing {
+  margin: 0 var(--space-3);
+  color: var(--state-disabled-text);
+  font-weight: var(--weight-label);
+  font-size: var(--fs-label);
+}

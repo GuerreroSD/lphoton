@@ -1,6 +1,8 @@
 import { create } from "zustand";
 import { createJSONStorage, persist, type StateStorage } from "zustand/middleware";
-import { getLibrary } from "../lib/library";
+import { isPlatformAvailable } from "../lib/accounts";
+import { getCachedLibrary, syncLibrary } from "../lib/library";
+import { errorMessage } from "../lib/tauri";
 import type { Game, LightModePreference, Platform, Theme } from "../types";
 
 // localStorage puede fallar (modo privado, almacenamiento bloqueado): nunca romper la app.
@@ -38,6 +40,9 @@ interface AppState {
   // Sesión actual
   games: Game[];
   libraryStatus: "idle" | "loading" | "ready" | "error";
+  /** Sincronización en segundo plano (después de pintar la caché). */
+  syncing: boolean;
+  syncWarning: string | null;
   searchOpen: boolean;
   query: string;
 
@@ -46,6 +51,8 @@ interface AppState {
   setLightModePref: (pref: LightModePreference) => void;
   setTheme: (theme: Theme) => void;
   loadLibrary: () => Promise<void>;
+  /** Vuelve a sincronizar (p. ej. tras guardar la API key). */
+  refreshLibrary: () => Promise<void>;
   openSearch: () => void;
   closeSearch: () => void;
   setQuery: (query: string) => void;
@@ -61,6 +68,8 @@ export const useAppStore = create<AppState>()(
 
       games: [],
       libraryStatus: "idle",
+      syncing: false,
+      syncWarning: null,
       searchOpen: false,
       query: "",
 
@@ -74,14 +83,35 @@ export const useAppStore = create<AppState>()(
       setLightModePref: (lightModePref) => set({ lightModePref }),
       setTheme: (theme) => set({ theme }),
 
+      // RNF7: primero se pinta la caché (sin red) y después se sincroniza.
       loadLibrary: async () => {
-        if (get().libraryStatus === "loading" || get().libraryStatus === "ready") return;
+        if (get().libraryStatus !== "idle") return;
         set({ libraryStatus: "loading" });
         try {
-          const games = await getLibrary();
+          const games = await getCachedLibrary();
           set({ games, libraryStatus: "ready" });
-        } catch {
-          set({ libraryStatus: "error" });
+        } catch (err) {
+          set({ libraryStatus: "error", syncWarning: errorMessage(err) });
+          return;
+        }
+        void get().refreshLibrary();
+      },
+
+      refreshLibrary: async () => {
+        if (get().syncing) return;
+        set({ syncing: true });
+        try {
+          const { games, warning } = await syncLibrary();
+          set((s) => ({
+            // Si la sincronización no trajo nada (p. ej. Steam no está), se conserva la caché.
+            games: games.length > 0 ? games : s.games,
+            libraryStatus: "ready",
+            syncWarning: warning,
+          }));
+        } catch (err) {
+          set({ syncWarning: `Error al sincronizar con Steam. ${errorMessage(err)}` });
+        } finally {
+          set({ syncing: false });
         }
       },
 
@@ -92,6 +122,16 @@ export const useAppStore = create<AppState>()(
     {
       name: "lphoton-settings",
       storage: createJSONStorage(() => safeStorage),
+      // En la app de escritorio solo cuentan las plataformas ya implementadas
+      // (el modo demo del navegador comparte este almacenamiento en desarrollo).
+      merge: (persisted, current) => {
+        const saved = (persisted ?? {}) as Partial<AppState>;
+        return {
+          ...current,
+          ...saved,
+          linkedPlatforms: (saved.linkedPlatforms ?? []).filter(isPlatformAvailable),
+        };
+      },
       partialize: (s) => ({
         username: s.username,
         linkedPlatforms: s.linkedPlatforms,
@@ -101,8 +141,3 @@ export const useAppStore = create<AppState>()(
     },
   ),
 );
-
-/** Juegos visibles según las plataformas vinculadas (una plataforma desvinculada no aporta juegos). */
-export function selectVisibleGames(state: Pick<AppState, "games" | "linkedPlatforms">): Game[] {
-  return state.games.filter((g) => g.sources.some((s) => state.linkedPlatforms.includes(s.platform)));
-}

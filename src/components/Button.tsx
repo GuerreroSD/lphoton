@@ -106,9 +106,15 @@ export function SearchIcon({ previewState, active, className, ...rest }: SearchI
 }
 
 // ── PlatformLinkButton (vincular cuenta) ─────────────────────────────
-type PlatformLinkButtonProps = BaseProps & { platform: Platform; linked: boolean; busy?: boolean };
+type PlatformLinkButtonProps = BaseProps & {
+  platform: Platform;
+  linked: boolean;
+  busy?: boolean;
+  /** La integración con esta plataforma aún no existe. */
+  unavailable?: boolean;
+};
 
-export function PlatformLinkButton({ platform, linked, busy, className, ...rest }: PlatformLinkButtonProps) {
+export function PlatformLinkButton({ platform, linked, busy, unavailable, className, ...rest }: PlatformLinkButtonProps) {
   const name = PLATFORM_NAMES[platform];
   return (
     <button
@@ -120,7 +126,7 @@ export function PlatformLinkButton({ platform, linked, busy, className, ...rest 
       <PlatformIcon platform={platform} className={styles.icon} />
       <span>{name}</span>
       <span className={styles.platformState}>
-        {busy ? "Vinculando…" : linked ? (
+        {unavailable ? "Próximamente" : busy ? "Vinculando…" : linked ? (
           <>
             <CheckGlyph width={12} height={12} style={{ display: "inline", verticalAlign: "-1px" }} /> Vinculada
           </>

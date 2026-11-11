@@ -1,12 +1,30 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import type { Game } from "../types";
 import styles from "./GameCover.module.css";
 
 /** Portada vertical 2:3. Borde celeste al pasar el mouse o con foco; clic abre la ficha. */
 export function GameCover({ game }: { game: Game }) {
+  const [failed, setFailed] = useState(!game.coverUrl);
   return (
     <Link to={`/juego/${game.id}`} className={styles.cover} aria-label={game.title} title={game.title}>
-      <img src={game.coverUrl} alt="" loading="lazy" decoding="async" width={600} height={900} />
+      {failed ? (
+        // Sin portada (juego sin arte en el CDN o sin conexión): placeholder liviano con el título.
+        <span className={styles.fallback} aria-hidden="true">
+          <span className={styles.fallbackBar} />
+          <span className={styles.fallbackTitle}>{game.title}</span>
+        </span>
+      ) : (
+        <img
+          src={game.coverUrl}
+          alt=""
+          loading="lazy"
+          decoding="async"
+          width={600}
+          height={900}
+          onError={() => setFailed(true)}
+        />
+      )}
     </Link>
   );
 }

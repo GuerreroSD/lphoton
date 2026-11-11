@@ -1,11 +1,13 @@
-import { useEffect, useState, type FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { PlatformLinkButton, PrimaryButton } from "../components/Button";
 import { Logo } from "../components/Logo";
+import { SteamApiKeyForm } from "../components/SteamApiKeyForm";
 import { Toast } from "../components/Toast";
-import { linkPlatform, login, unlinkPlatform } from "../lib/accounts";
-import { countGamesFor } from "../lib/library";
+import { isPlatformAvailable, linkPlatform, login, unlinkPlatform } from "../lib/accounts";
+import { errorMessage, inTauri } from "../lib/tauri";
 import { useAppStore } from "../store/appStore";
+import { useLibrary } from "../store/useLibrary";
 import type { Platform } from "../types";
 import styles from "./Login.module.css";
 
@@ -24,16 +26,11 @@ export function Login() {
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [busy, setBusy] = useState<Platform | null>(null);
-  const [detected, setDetected] = useState<number | null>(null);
-
-  useEffect(() => {
-    let alive = true;
-    if (linked.length === 0) setDetected(null);
-    else countGamesFor(linked).then((n) => alive && setDetected(n));
-    return () => {
-      alive = false;
-    };
-  }, [linked]);
+  const [linkError, setLinkError] = useState<string | null>(null);
+  // La biblioteca se lee desde la caché/escaneo local; el conteo sale de ahí.
+  const { entries, status } = useLibrary();
+  const syncing = useAppStore((s) => s.syncing);
+  const detected = linked.length > 0 && status === "ready" ? entries.length : null;
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -52,6 +49,7 @@ export function Login() {
 
   const togglePlatform = async (platform: Platform) => {
     setBusy(platform);
+    setLinkError(null);
     try {
       if (linked.includes(platform)) {
         await unlinkPlatform(platform);
@@ -60,6 +58,8 @@ export function Login() {
         await linkPlatform(platform);
         setPlatformLinked(platform, true);
       }
+    } catch (err) {
+      setLinkError(errorMessage(err));
     } finally {
       setBusy(null);
     }
@@ -115,17 +115,22 @@ export function Login() {
                 platform={p}
                 linked={linked.includes(p)}
                 busy={busy === p}
-                disabled={busy !== null}
+                unavailable={!isPlatformAvailable(p)}
+                disabled={busy !== null || !isPlatformAvailable(p)}
                 onClick={() => togglePlatform(p)}
               />
             ))}
           </div>
+          {linkError && <Toast tone="error">{linkError}</Toast>}
+          {inTauri && linked.includes("steam") && <SteamApiKeyForm />}
         </section>
 
         {detected !== null && (
           <div className={styles.result}>
             <Toast tone="success">
-              Se han detectado {detected} {detected === 1 ? "juego" : "juegos"} en su biblioteca
+              {syncing && detected === 0
+                ? "Buscando tus juegos…"
+                : `Se han detectado ${detected} ${detected === 1 ? "juego" : "juegos"} en su biblioteca`}
             </Toast>
             <PrimaryButton onClick={() => navigate("/biblioteca")}>Ir a la biblioteca</PrimaryButton>
           </div>
