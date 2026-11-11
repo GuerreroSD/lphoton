@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useLayoutEffect } from "react";
 import { BrowserRouter, Navigate, Outlet, Route, Routes } from "react-router-dom";
 import { NavBar } from "./components/NavBar";
 import { useAppStore } from "./store/appStore";
@@ -31,7 +31,10 @@ function MainLayout() {
 
 export function App() {
   const theme = useAppStore((s) => s.theme);
-  useEffect(() => {
+  // Antes de pintar, para que no parpadee el tema oscuro.
+  useLayoutEffect(() => {
+    // La pantalla de carga fija su propio tema (siempre oscuro).
+    if (window.location.pathname.startsWith("/cargando/")) return;
     document.documentElement.dataset.theme = theme;
   }, [theme]);
 

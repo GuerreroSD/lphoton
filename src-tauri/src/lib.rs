@@ -12,6 +12,7 @@ mod metrics;
 mod models;
 mod platform;
 mod processes;
+mod system;
 mod tray;
 
 use std::io::Write;
@@ -113,6 +114,12 @@ pub fn run() {
             std::thread::spawn(move || launcher::recover_pending(&recovery));
             log_line(&state, &format!("setup_ms={}", started.elapsed().as_millis()));
             app.manage(state);
+            // Inicio con Windows: arranca solo en la bandeja, sin crear el WebView.
+            if system::started_in_tray() {
+                if let Some(window) = app.get_webview_window("main") {
+                    let _ = window.destroy();
+                }
+            }
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
@@ -135,6 +142,10 @@ pub fn run() {
             commands::add_fix,
             commands::vote_fix,
             commands::delete_fix,
+            commands::get_autostart,
+            commands::set_autostart,
+            commands::install_paths,
+            commands::open_install_path,
         ])
         .build(tauri::generate_context!())
         .expect("error al iniciar LPhoton")

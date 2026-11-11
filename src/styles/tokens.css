@@ -143,13 +143,42 @@
   color-scheme: dark;
 }
 
-/* Modo claro: se intercambian los tokens (§5.1). Las maquetas usan el oscuro (predeterminado). */
+/*
+ * Modo claro (§5.1): se intercambian los tokens. El neutral claro pasa a ser el
+ * fondo y el morado intenso el texto (par aprobado, 7.6:1). Verde y rosado se
+ * oscurecen para mantener 4.5:1 sobre el neutral claro (los originales no
+ * llegan: 1.6:1 y 2.5:1). Las maquetas usan el oscuro, que es el predeterminado.
+ */
 :root[data-theme="light"] {
-  --surface-app: var(--color-bg-light);
-  --text-strong: var(--color-deep);
-  --border-container: var(--color-primary);
-  --border-subtle: rgb(var(--color-deep-rgb) / 0.35);
-  --divider: rgb(var(--color-deep-rgb) / 0.25);
+  --palette-success-on-light: #00592f; /* 5.2:1 sobre #DBC5DD */
+  --palette-success-on-light-rgb: 0 89 47;
+  --palette-alert-on-light: #a3004f; /* 5.0:1 sobre #DBC5DD */
+  --palette-alert-on-light-rgb: 163 0 79;
+
+  --color-accent: var(--palette-deep);
+  --color-accent-rgb: var(--palette-deep-rgb);
+  --color-bg-dark: var(--palette-neutral-light);
+  --color-bg-dark-rgb: var(--palette-neutral-light-rgb);
+  --color-success: var(--palette-success-on-light);
+  --color-success-rgb: var(--palette-success-on-light-rgb);
+  --color-alert: var(--palette-alert-on-light);
+  --color-alert-rgb: var(--palette-alert-on-light-rgb);
+
+  --surface-app: var(--palette-neutral-light);
+  --surface-container: var(--palette-neutral-light);
+  --surface-sunken: rgb(var(--palette-deep-rgb) / 0.07);
+  --text-strong: var(--palette-deep);
+  /* JUGAR conserva el texto oscuro de la maqueta. */
+  --text-on-primary: var(--palette-neutral-dark);
+  --border-container: var(--palette-deep);
+  --border-subtle: rgb(var(--palette-deep-rgb) / 0.35);
+  --divider: rgb(var(--palette-deep-rgb) / 0.22);
+  --platform-icon: var(--palette-deep);
+  --cover-placeholder: rgb(var(--palette-deep-rgb) / 0.08);
+  --state-disabled-bg: rgb(var(--palette-deep-rgb) / 0.1);
+  --state-disabled-text: rgb(var(--palette-deep-rgb) / 0.78);
   --logo-gradient: var(--logo-gradient-on-light);
+  --shadow-play-hover: 3px 4px 0 0 rgb(var(--palette-deep-rgb) / 0.9);
+  --shadow-modal: 0 10px 30px 0 rgb(var(--palette-deep-rgb) / 0.3);
   color-scheme: light;
 }

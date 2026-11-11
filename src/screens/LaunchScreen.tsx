@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { PlatformIcon } from "../assets/icons/icons";
 import { TextButton } from "../components/Button";
 import { Logo } from "../components/Logo";
 import { ProgressBar } from "../components/ProgressBar";
 import { LAUNCH_STEP_LABELS, launchGame } from "../lib/launcher";
+import { useAppStore } from "../store/appStore";
 import { useLibrary } from "../store/useLibrary";
 import { PLATFORM_NAMES, type LaunchProgress, type Platform } from "../types";
 import styles from "./LaunchScreen.module.css";
@@ -13,6 +14,14 @@ const PLATFORMS: Platform[] = ["steam", "epic", "gog"];
 
 /** Pantalla de carga "Iniciando juego optimizado" — maqueta 04. */
 export function LaunchScreen() {
+  // La maqueta 04 es siempre oscura (luces sobre #2D1B36), aunque el tema elegido sea claro.
+  useLayoutEffect(() => {
+    document.documentElement.dataset.theme = "dark";
+    return () => {
+      document.documentElement.dataset.theme = useAppStore.getState().theme;
+    };
+  }, []);
+
   const { id = "" } = useParams();
   const [params] = useSearchParams();
   const navigate = useNavigate();

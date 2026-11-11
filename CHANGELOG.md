@@ -1,5 +1,36 @@
 # Changelog
 
+## [0.6.0] – 2026-11-11 · Fase 6: Rendimiento y pulido
+
+### Configuraciones (§6.7)
+- **Plataformas vinculadas**: vincular y desvincular. Debe quedar al menos una.
+- **Modo ligero**: *Preguntar*, *Siempre* o *Nunca*, con una explicación de cada opción. Así se cumple el "Recordar mi elección" del diálogo ¿Optimizar RAM? (§6.4).
+- **Procesos que se aligeran**: lista editable (agregar, quitar y restaurar los predeterminados). Se rechazan los procesos principales de los clientes (`steam.exe`, `EpicGamesLauncher.exe`, `GalaxyClient.exe`), que nunca se modifican.
+- **Apariencia**: tema oscuro (predeterminado) o claro.
+- **Iniciar con Windows**: **desactivado por defecto**. Al activarlo se registra en `HKCU\…\Run` con `--tray`, así que LPhoton arranca solo en la bandeja, sin crear la ventana ni el WebView.
+- **Rutas de instalación**: las carpetas de juegos detectadas en Steam, Epic y GOG, cuántos juegos hay en cada una y un botón "Abrir carpeta". Solo se abren las rutas detectadas.
+- **Acerca de**: versión, sin anuncios.
+
+### Perfil (§6.7)
+- Nombre editable, plataformas, total de juegos, instalados y horas jugadas sumadas de todas las tiendas.
+- Tabla por plataforma (juegos, instalados, horas) y los 5 juegos más jugados, con enlace a su ficha.
+
+### Modo claro (§5.1)
+- Se intercambian los tokens: el neutral claro `#DBC5DD` pasa a ser el fondo y el morado intenso `#4A1550` el texto (par aprobado). El logo usa el degradado que parte en morado (§5.3).
+- El verde y el rosado se oscurecen en modo claro (`#00592F` y `#A3004F`) para mantener 4.5:1. Los originales sobre el fondo claro no llegan.
+- La pantalla de carga sigue siempre oscura, como la maqueta 04.
+- El tema se aplica antes del primer pintado, sin parpadeo.
+
+### Rendimiento
+- `docs/rendimiento.md` documenta las mediciones reales del log:
+  - **RNF7**: 0,6–1,8 s hasta mostrar la biblioteca, con hasta 159 juegos. Meta: < 4 s.
+  - **RNF6**: 35–45 MB mientras se juega. Meta: < 100 MB.
+  - Modo ligero: 762 MB liberados.
+
+### Otros
+- Se quitaron los avisos "Sección en construcción".
+- Backend: nuevo módulo `system.rs` y los comandos `get_autostart`, `set_autostart`, `install_paths` y `open_install_path`. 29 tests (antes 27).
+
 ## [0.5.0] – 2026-11-11 · Fase 5: Comunidad
 
 ### Decisión de diseño

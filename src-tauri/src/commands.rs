@@ -9,6 +9,7 @@ use crate::community::{self, CommunityFix, NewFix};
 use crate::launcher::LaunchRequest;
 use crate::lightmode::{self, ClientLoad};
 use crate::metrics::{self, AppMetrics};
+use crate::system::{self, InstallPath};
 use crate::{credentials, launcher, processes, AppState};
 
 fn blocking<T: Send + 'static>(f: impl FnOnce() -> T + Send + 'static) -> impl std::future::Future<Output = Result<T, String>> {
@@ -212,6 +213,31 @@ pub async fn vote_fix(state: State<'_, AppState>, id: i64, delta: i64) -> Result
 pub async fn delete_fix(state: State<'_, AppState>, id: i64) -> Result<(), String> {
     let state = state.inner().clone();
     blocking(move || state.db.delete_fix(id)).await?.map_err(|e| e.to_string())
+}
+
+// ── Configuraciones (§6.7) ──────────────────────────────────────────────
+
+#[tauri::command]
+pub async fn get_autostart() -> Result<bool, String> {
+    blocking(system::autostart_enabled).await
+}
+
+#[tauri::command]
+pub async fn set_autostart(enabled: bool) -> Result<bool, String> {
+    blocking(move || system::set_autostart(enabled)).await??;
+    Ok(enabled)
+}
+
+#[tauri::command]
+pub async fn install_paths(state: State<'_, AppState>) -> Result<Vec<InstallPath>, String> {
+    let state = state.inner().clone();
+    blocking(move || system::install_paths(&state)).await
+}
+
+#[tauri::command]
+pub async fn open_install_path(state: State<'_, AppState>, path: String) -> Result<(), String> {
+    let state = state.inner().clone();
+    blocking(move || system::open_install_path(&state, &path)).await?
 }
 
 /// El frontend avisa cuando la biblioteca ya está pintada (RNF7).
