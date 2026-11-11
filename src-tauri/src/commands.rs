@@ -5,6 +5,7 @@ use tauri::{AppHandle, State};
 
 use crate::library::{self, gog, steam, PlatformsStatus, SyncResult};
 use crate::models::{Game, GameDetails, Platform};
+use crate::community::{self, CommunityFix, NewFix};
 use crate::launcher::LaunchRequest;
 use crate::lightmode::{self, ClientLoad};
 use crate::metrics::{self, AppMetrics};
@@ -177,6 +178,40 @@ pub async fn set_lightmode_targets(state: State<'_, AppState>, targets: Vec<Stri
     let json = serde_json::to_string(&clean).map_err(|e| e.to_string())?;
     blocking(move || state.db.set_meta("lightmode_targets", &json)).await?.map_err(|e| e.to_string())?;
     Ok(clean)
+}
+
+// ── Comunidad (RF4) ─────────────────────────────────────────────────────
+
+#[tauri::command]
+pub async fn list_fixes(state: State<'_, AppState>, game_id: String) -> Result<Vec<CommunityFix>, String> {
+    let state = state.inner().clone();
+    blocking(move || state.db.list_fixes(&game_id)).await?.map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+pub async fn fix_counts(state: State<'_, AppState>) -> Result<std::collections::HashMap<String, i64>, String> {
+    let state = state.inner().clone();
+    let counts = blocking(move || state.db.fix_counts()).await?.map_err(|e| e.to_string())?;
+    Ok(counts.into_iter().collect())
+}
+
+#[tauri::command]
+pub async fn add_fix(state: State<'_, AppState>, fix: NewFix) -> Result<i64, String> {
+    let fix = community::validate(fix)?;
+    let state = state.inner().clone();
+    blocking(move || state.db.add_fix(&fix)).await?.map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+pub async fn vote_fix(state: State<'_, AppState>, id: i64, delta: i64) -> Result<(), String> {
+    let state = state.inner().clone();
+    blocking(move || state.db.vote_fix(id, delta)).await?.map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+pub async fn delete_fix(state: State<'_, AppState>, id: i64) -> Result<(), String> {
+    let state = state.inner().clone();
+    blocking(move || state.db.delete_fix(id)).await?.map_err(|e| e.to_string())
 }
 
 /// El frontend avisa cuando la biblioteca ya está pintada (RNF7).

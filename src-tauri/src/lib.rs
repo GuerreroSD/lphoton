@@ -1,6 +1,7 @@
 //! Backend de LPhoton (Tauri 2).
 
 mod commands;
+mod community;
 mod covers;
 mod credentials;
 mod db;
@@ -129,6 +130,11 @@ pub fn run() {
             commands::get_app_metrics,
             commands::get_lightmode_targets,
             commands::set_lightmode_targets,
+            commands::list_fixes,
+            commands::fix_counts,
+            commands::add_fix,
+            commands::vote_fix,
+            commands::delete_fix,
         ])
         .build(tauri::generate_context!())
         .expect("error al iniciar LPhoton")

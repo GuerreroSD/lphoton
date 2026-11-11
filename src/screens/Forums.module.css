@@ -1,0 +1,342 @@
+.forums {
+  display: flex;
+  height: 100%;
+  min-height: 0;
+}
+
+/* Panel izquierdo como el de la Biblioteca. */
+.sidebar {
+  flex: none;
+  width: var(--sidebar-width);
+  padding: var(--space-6) var(--space-4) var(--space-6) var(--space-5);
+  border-right: 2px solid var(--divider);
+  overflow-y: auto;
+}
+
+.heading {
+  margin: 0 0 var(--space-4);
+  color: var(--color-accent);
+  font-family: var(--font-title);
+  font-weight: var(--weight-title);
+  font-size: var(--fs-title);
+}
+
+.filter,
+.input,
+.textarea {
+  width: 100%;
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-md);
+  background: var(--surface-sunken);
+  box-shadow: inset 0 0 0 1px var(--border-subtle);
+  color: var(--color-accent);
+  font-size: var(--fs-body-sm);
+  user-select: text;
+}
+
+.filter,
+.input {
+  height: 40px;
+}
+
+.textarea {
+  padding: var(--space-2) var(--space-3);
+  resize: vertical;
+  line-height: var(--lh-body);
+}
+
+.filter:focus-visible,
+.input:focus-visible,
+.textarea:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 1px var(--color-accent);
+}
+
+.filter::placeholder,
+.input::placeholder,
+.textarea::placeholder {
+  color: var(--state-disabled-text);
+}
+
+.list {
+  margin: var(--space-4) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: 38px;
+  padding: var(--space-1) var(--space-3);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-accent);
+  text-align: left;
+  transition: box-shadow var(--duration-base) var(--ease-out);
+}
+
+.item:hover,
+.item[aria-current="true"] {
+  box-shadow: inset 2px 0 0 var(--color-accent);
+}
+
+.item[aria-current="true"] {
+  background: var(--surface-sunken);
+}
+
+.itemTitle {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: var(--weight-label);
+  font-size: var(--fs-label);
+}
+
+.count {
+  flex: none;
+  min-width: 20px;
+  padding: 0 var(--space-1);
+  border-radius: var(--radius-pill);
+  background: var(--color-accent);
+  color: var(--color-bg-dark);
+  font-weight: var(--weight-label);
+  font-size: var(--fs-label);
+  text-align: center;
+}
+
+.content {
+  flex: 1;
+  min-width: 0;
+  padding: var(--space-6) var(--space-6) var(--space-7);
+  overflow-y: auto;
+}
+
+.game {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  width: min(820px, 100%);
+  margin: 0 auto;
+}
+
+.gameHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-5);
+  flex-wrap: wrap;
+  padding-bottom: var(--space-5);
+  border-bottom: 1px solid var(--divider);
+}
+
+.gameTitle {
+  margin: 0 0 var(--space-2);
+  color: var(--color-accent);
+  font-family: var(--font-title);
+  font-weight: var(--weight-title);
+  font-size: var(--fs-title);
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.subtitle {
+  margin: 0;
+  color: var(--color-accent);
+  font-family: var(--font-title);
+  font-weight: var(--weight-title);
+  font-size: var(--fs-title-sm);
+}
+
+.empty {
+  margin: 0;
+  color: var(--color-accent);
+  font-size: var(--fs-body-sm);
+}
+
+/* ── Tarjetas de soluciones ─────────────────────────────────────────── */
+.fixes {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.fix {
+  display: flex;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  box-shadow: inset 0 0 0 1px var(--border-subtle);
+}
+
+.votes {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  flex: none;
+  width: 36px;
+}
+
+.vote {
+  width: 28px;
+  height: 24px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-accent);
+  font-size: var(--fs-label);
+  transition: box-shadow var(--duration-base) var(--ease-out);
+}
+
+.vote:hover {
+  box-shadow: inset 0 0 0 1px var(--color-accent);
+}
+
+.voteCount {
+  color: var(--color-accent);
+  font-family: var(--font-title);
+  font-weight: var(--weight-title);
+  font-size: var(--fs-title-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+.fixBody {
+  min-width: 0;
+  flex: 1;
+}
+
+.kind {
+  display: inline-block;
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-pill);
+  box-shadow: inset 0 0 0 1px var(--color-accent);
+  color: var(--color-accent);
+  font-weight: var(--weight-label);
+  font-size: var(--fs-label);
+}
+
+.kindMod {
+  box-shadow: inset 0 0 0 1px var(--color-success);
+  color: var(--color-success);
+}
+
+.fixTitle {
+  margin: var(--space-2) 0 var(--space-1);
+  color: var(--color-accent);
+  font-family: var(--font-title);
+  font-weight: var(--weight-title);
+  font-size: var(--fs-title-sm);
+}
+
+.fixDescription {
+  margin: 0;
+  color: var(--color-accent);
+  font-size: var(--fs-body-sm);
+  line-height: var(--lh-body);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  user-select: text;
+}
+
+.fixActions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  margin-top: var(--space-2);
+}
+
+.plain,
+.danger {
+  padding: 0;
+  border: 0;
+  background: none;
+  font-weight: var(--weight-label);
+  font-size: var(--fs-label);
+}
+
+.plain {
+  color: var(--state-disabled-text);
+}
+
+.plain:hover {
+  color: var(--color-accent);
+}
+
+/* Rosado sobre neutral oscuro: excepción aprobada (4.21:1). */
+.danger {
+  color: var(--color-alert);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.confirm {
+  color: var(--color-accent);
+  font-weight: var(--weight-label);
+  font-size: var(--fs-label);
+}
+
+/* ── Formulario ─────────────────────────────────────────────────────── */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  box-shadow: inset 0 0 0 1px var(--color-accent);
+}
+
+.kindPicker {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.kindOption {
+  height: 30px;
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  box-shadow: inset 0 0 0 1px var(--border-subtle);
+  color: var(--color-accent);
+  font-weight: var(--weight-label);
+  font-size: var(--fs-label);
+}
+
+.kindOption[aria-checked="true"] {
+  background: var(--color-accent);
+  color: var(--color-bg-dark);
+  box-shadow: none;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.label {
+  color: var(--color-accent);
+  font-weight: var(--weight-label);
+  font-size: var(--fs-label);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-caps);
+}
+
+.formActions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}

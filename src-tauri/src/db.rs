@@ -9,6 +9,7 @@ use std::time::{SystemTime, UNIX_EPOCH};
 
 use rusqlite::{params, Connection, OptionalExtension};
 
+use crate::community::{CommunityFix, FixKind, NewFix};
 use crate::models::{Game, GameDetails};
 
 /// Los detalles de la tienda cambian poco: se refrescan cada 30 días.
@@ -39,7 +40,18 @@ impl Db {
              CREATE TABLE IF NOT EXISTS meta (
                  key   TEXT PRIMARY KEY,
                  value TEXT NOT NULL
-             );",
+             );
+             CREATE TABLE IF NOT EXISTS community_fixes (
+                 id          INTEGER PRIMARY KEY AUTOINCREMENT,
+                 game_id     TEXT NOT NULL,
+                 kind        TEXT NOT NULL,
+                 title       TEXT NOT NULL,
+                 description TEXT NOT NULL,
+                 url         TEXT,
+                 votes       INTEGER NOT NULL DEFAULT 0,
+                 created_at  INTEGER NOT NULL
+             );
+             CREATE INDEX IF NOT EXISTS community_fixes_game ON community_fixes (game_id);",
         )?;
         Ok(Db(Mutex::new(conn)))
     }
@@ -90,6 +102,63 @@ impl Db {
         Ok(row
             .filter(|(_, fetched)| now() - fetched < DETAILS_TTL_SECS)
             .and_then(|(json, _)| serde_json::from_str(&json).ok()))
+    }
+
+    // ── Comunidad (RF4) ────────────────────────────────────────────────
+
+    /// Soluciones de un juego, de más a menos votadas (y las más nuevas primero si empatan).
+    pub fn list_fixes(&self, game_id: &str) -> rusqlite::Result<Vec<CommunityFix>> {
+        let conn = self.conn();
+        let mut stmt = conn.prepare_cached(
+            "SELECT id, game_id, kind, title, description, url, votes, created_at
+             FROM community_fixes WHERE game_id = ?1
+             ORDER BY votes DESC, created_at DESC, id DESC",
+        )?;
+        let rows = stmt.query_map(params![game_id], |r| {
+            Ok(CommunityFix {
+                id: r.get(0)?,
+                game_id: r.get(1)?,
+                kind: FixKind::parse(&r.get::<_, String>(2)?).unwrap_or(FixKind::Fix),
+                title: r.get(3)?,
+                description: r.get(4)?,
+                url: r.get(5)?,
+                votes: r.get(6)?,
+                created_at: r.get(7)?,
+            })
+        })?;
+        rows.collect()
+    }
+
+    /// Cantidad de soluciones por juego (para mostrarla en la lista de Foros).
+    pub fn fix_counts(&self) -> rusqlite::Result<Vec<(String, i64)>> {
+        let conn = self.conn();
+        let mut stmt = conn.prepare_cached("SELECT game_id, COUNT(*) FROM community_fixes GROUP BY game_id")?;
+        let rows = stmt.query_map([], |r| Ok((r.get(0)?, r.get(1)?)))?;
+        rows.collect()
+    }
+
+    pub fn add_fix(&self, fix: &NewFix) -> rusqlite::Result<i64> {
+        let conn = self.conn();
+        conn.execute(
+            "INSERT INTO community_fixes (game_id, kind, title, description, url, votes, created_at)
+             VALUES (?1, ?2, ?3, ?4, ?5, 0, ?6)",
+            params![fix.game_id, fix.kind.as_str(), fix.title, fix.description, fix.url, now()],
+        )?;
+        Ok(conn.last_insert_rowid())
+    }
+
+    /// Suma `delta` (+1 o -1) a los votos.
+    pub fn vote_fix(&self, id: i64, delta: i64) -> rusqlite::Result<()> {
+        self.conn().execute(
+            "UPDATE community_fixes SET votes = votes + ?2 WHERE id = ?1",
+            params![id, delta.signum()],
+        )?;
+        Ok(())
+    }
+
+    pub fn delete_fix(&self, id: i64) -> rusqlite::Result<()> {
+        self.conn().execute("DELETE FROM community_fixes WHERE id = ?1", params![id])?;
+        Ok(())
     }
 
     pub fn get_meta(&self, key: &str) -> Option<String> {
@@ -172,6 +241,32 @@ mod tests {
         let details = GameDetails { genre: Some("Acción".into()), ..Default::default() };
         db.save_details("steam-10", &details).unwrap();
         assert_eq!(db.get_details("steam-10").unwrap().unwrap().genre.as_deref(), Some("Acción"));
+        drop(db);
+        let _ = std::fs::remove_dir_all(dir);
+    }
+
+    #[test]
+    fn community_fixes_sorted_by_votes() {
+        let dir = std::env::temp_dir().join(format!("lphoton-fix-test-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).unwrap();
+        let db = Db::open(&dir.join("t.db")).unwrap();
+        let fix = |title: &str| NewFix {
+            game_id: "steam-10".into(),
+            kind: FixKind::Mod,
+            title: title.into(),
+            description: String::new(),
+            url: None,
+        };
+        let a = db.add_fix(&fix("A")).unwrap();
+        let b = db.add_fix(&fix("B")).unwrap();
+        db.vote_fix(b, 1).unwrap();
+        db.vote_fix(b, 5).unwrap(); // se normaliza a +1
+        db.vote_fix(a, -1).unwrap();
+        let list = db.list_fixes("steam-10").unwrap();
+        assert_eq!(list.iter().map(|f| (f.title.as_str(), f.votes)).collect::<Vec<_>>(), vec![("B", 2), ("A", -1)]);
+        assert_eq!(db.fix_counts().unwrap(), vec![("steam-10".to_string(), 2)]);
+        db.delete_fix(a).unwrap();
+        assert_eq!(db.list_fixes("steam-10").unwrap().len(), 1);
         drop(db);
         let _ = std::fs::remove_dir_all(dir);
     }

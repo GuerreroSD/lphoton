@@ -83,3 +83,31 @@ export interface LaunchProgress {
 
 export type LightModePreference = "ask" | "always" | "never";
 export type Theme = "dark" | "light";
+
+/** Comunidad (RF4): solución técnica o mod de rendimiento guardado por el usuario. */
+export type FixKind = "fix" | "mod";
+
+export const FIX_KIND_LABELS: Record<FixKind, string> = {
+  fix: "Solución técnica",
+  mod: "Mod de rendimiento",
+};
+
+export interface CommunityFix {
+  id: number;
+  gameId: string;
+  kind: FixKind;
+  title: string;
+  description: string;
+  url: string | null;
+  votes: number;
+  /** Segundos Unix. */
+  createdAt: number;
+}
+
+export interface NewFix {
+  gameId: string;
+  kind: FixKind;
+  title: string;
+  description: string;
+  url: string | null;
+}

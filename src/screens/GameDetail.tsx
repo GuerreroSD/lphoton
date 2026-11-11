@@ -167,6 +167,9 @@ export function GameDetail() {
                       ? game.title
                       : "Cargando información…")}
               </p>
+              <Link to={`/foros?juego=${encodeURIComponent(game.id)}`} className={styles.community}>
+                Soluciones y mods →
+              </Link>
             </div>
             <ul className={styles.meta}>
               {details?.genre && <li>Género: {details.genre}</li>}

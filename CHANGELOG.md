@@ -1,5 +1,34 @@
 # Changelog
 
+## [0.5.0] – 2026-11-11 · Fase 5: Comunidad
+
+### Decisión de diseño
+- La especificación (§6.6) proponía leer los *fixes* desde la API Cargo de **PCGamingWiki**. Hoy esa API responde a los clientes automáticos con un **desafío anti-bots de Cloudflare**, y eludirlo no corresponde. Además, PCGamingWiki **no tiene votos**. Por decisión del usuario se combinan dos cosas:
+  1. **Enlace directo a PCGamingWiki** por juego, que se abre en el navegador del sistema (por AppID de Steam con `api/appid.php`; si no, búsqueda por título).
+  2. **Soluciones y mods propios, ordenados por votos**, guardados en el equipo (SQLite).
+- Si más adelante PCGamingWiki da acceso a su API (canal oficial), sus soluciones se podrán mostrar dentro de LPhoton.
+
+### Backend (Rust)
+- Tabla `community_fixes` (juego, tipo *fix*/*mod*, título, descripción, enlace, votos, fecha) con índice por juego.
+- Comandos `list_fixes` (ordenados por votos y luego los más nuevos), `fix_counts`, `add_fix`, `vote_fix` (±1, normalizado) y `delete_fix`.
+- Validación en `community.rs`: título obligatorio (≤ 120), descripción ≤ 2000 y enlaces solo `http(s)://`, para rechazar `javascript:`, `file:` y similares.
+- 27 tests unitarios (antes 24).
+
+### Frontend
+- **Foros**: a la izquierda tus juegos, con buscador y la cantidad de soluciones guardadas por juego. A la derecha, el juego elegido con:
+  - Botón **"Ver soluciones y mods en PCGamingWiki →"**.
+  - **"Mis soluciones y mods"**: tarjetas con votos ▲/▼, tipo (*Solución técnica* en celeste, *Mod de rendimiento* en verde), descripción, "Abrir enlace →" y eliminar con confirmación.
+  - Formulario "+ Agregar solución" (tipo, título, descripción, enlace opcional) con mensajes claros.
+- **Ficha del juego**: enlace "Soluciones y mods →" que abre Foros con ese juego seleccionado (§6.3, acceso a Comunidad desde la ficha).
+- En el modo demo del navegador las soluciones se guardan en localStorage.
+
+### Verificación
+- `cargo test` ✔ (27) · `npx tsc -b` ✔ · `npm run lint` ✔.
+- Modo demo: desde la ficha de *Resident Evil Requiem* → Foros con el juego seleccionado; dos soluciones agregadas, votos y reordenamiento correctos, contador "2" en la lista, enlace `javascript:` rechazado, sin errores de consola.
+
+### Limitaciones
+- Los votos son **solo tuyos y de este equipo**. Compartirlos entre usuarios requiere un backend propio (fuera del alcance del MVP).
+
 ## [0.4.0] – 2026-11-11 · Fase 4: ejecución intervenida, modo ligero y bandeja
 
 ### Backend (Rust)

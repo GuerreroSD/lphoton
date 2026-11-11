@@ -157,3 +157,14 @@
   font-size: var(--fs-title);
   text-transform: uppercase;
 }
+
+/* Acceso a la Comunidad desde la ficha (§6.3). */
+.community {
+  display: inline-block;
+  margin-top: var(--space-2);
+  color: var(--color-accent);
+  font-weight: var(--weight-label);
+  font-size: var(--fs-label);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
