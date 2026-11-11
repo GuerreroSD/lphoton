@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { GameCover } from "../components/GameCover";
 import { GameListItem } from "../components/GameListItem";
 import { LibraryFilters } from "../components/LibraryFilters";
+import { PlatformHint } from "../components/PlatformHint";
 import { Toast } from "../components/Toast";
 import { reportStartup } from "../lib/library";
 import { useAppStore } from "../store/appStore";
@@ -65,6 +66,7 @@ export function Library() {
             />
           </div>
         )}
+        <PlatformHint />
         <LibraryFilters platforms={linked} count={list.length} />
         <ul className={styles.list}>
           {list.map((e) => (

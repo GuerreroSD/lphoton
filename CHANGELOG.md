@@ -18,6 +18,7 @@
 ### Frontend
 - Se pueden vincular **Epic y GOG** en Login y Configuraciones, verificando que el cliente o sus juegos existan en el equipo. Si no, aparece un mensaje claro.
 - **Filtros del panel izquierdo** (§6.2): por plataforma (solo las vinculadas), *Instalados* y *Recientes* (últimos 30 días), con un conteo y la opción "Quitar filtros". Se recuerdan entre sesiones.
+- **Aviso de plataformas sin vincular**: si LPhoton detecta Epic o GOG instalados con juegos y no están vinculados, la biblioteca muestra *"Encontramos N juegos de Epic Games en este equipo. Vincular →"* (un clic) o *"Ahora no"* (no vuelve a aparecer).
 - Portadas y detalles con prioridad Steam → GOG → Epic. Los juegos solo de Epic usan el placeholder sin hacer pedidos de red.
 
 ### Verificación

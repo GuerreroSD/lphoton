@@ -47,6 +47,8 @@ interface AppState {
   lightModePref: LightModePreference;
   theme: Theme;
   filters: LibraryFilters;
+  /** Plataformas cuyo aviso "Encontramos juegos de…" el usuario descartó. */
+  dismissedPlatformHints: Platform[];
 
   // Sesión actual
   games: Game[];
@@ -69,6 +71,7 @@ interface AppState {
   setQuery: (query: string) => void;
   togglePlatformFilter: (platform: Platform) => void;
   setFilters: (filters: Partial<LibraryFilters>) => void;
+  dismissPlatformHint: (platform: Platform) => void;
 }
 
 export const useAppStore = create<AppState>()(
@@ -79,6 +82,7 @@ export const useAppStore = create<AppState>()(
       lightModePref: "ask",
       theme: "dark",
       filters: NO_FILTERS,
+      dismissedPlatformHints: [],
 
       games: [],
       libraryStatus: "idle",
@@ -142,6 +146,8 @@ export const useAppStore = create<AppState>()(
           },
         })),
       setFilters: (filters) => set((s) => ({ filters: { ...s.filters, ...filters } })),
+      dismissPlatformHint: (platform) =>
+        set((s) => ({ dismissedPlatformHints: Array.from(new Set([...s.dismissedPlatformHints, platform])) })),
     }),
     {
       name: "lphoton-settings",
@@ -163,6 +169,7 @@ export const useAppStore = create<AppState>()(
         lightModePref: s.lightModePref,
         theme: s.theme,
         filters: s.filters,
+        dismissedPlatformHints: s.dismissedPlatformHints,
       }),
     },
   ),
