@@ -87,6 +87,7 @@ pub fn run() {
             commands::sync_library,
             commands::get_game_details,
             commands::steam_status,
+            commands::platforms_status,
             commands::set_steam_api_key,
             commands::clear_steam_api_key,
             commands::launch_game,

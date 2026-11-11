@@ -12,10 +12,24 @@ export interface Session {
   username: string;
 }
 
-/** Plataformas que ya se pueden vincular de verdad en la app de escritorio. */
+/** Plataformas integradas (las tres desde la fase 3). */
 export function isPlatformAvailable(platform: Platform): boolean {
-  return !inTauri || platform === "steam";
+  return platform === "steam" || platform === "epic" || platform === "gog";
 }
+
+export type PlatformsStatus = Record<Platform, boolean>;
+
+/** Qué clientes están instalados en este equipo. */
+export async function getPlatformsStatus(): Promise<PlatformsStatus> {
+  if (!inTauri) return { steam: true, epic: true, gog: true };
+  return invoke<PlatformsStatus>("platforms_status");
+}
+
+const NOT_FOUND_MESSAGES: Record<Platform, string> = {
+  steam: "No encontramos Steam en este equipo. Instálalo e inicia sesión una vez.",
+  epic: "No encontramos Epic Games Launcher ni juegos instalados con él.",
+  gog: "No encontramos GOG Galaxy ni juegos de GOG instalados en este equipo.",
+};
 
 export async function login(username: string, password: string): Promise<Session> {
   await delay(250);
@@ -31,7 +45,7 @@ export async function getSteamStatus(): Promise<SteamStatus> {
 }
 
 /**
- * Vincula una plataforma. Para Steam exige que esté instalado en el equipo.
+ * Vincula una plataforma: exige que su cliente (o sus juegos) esté en el equipo.
  * Lanza un Error con un mensaje para el usuario si no se puede.
  */
 export async function linkPlatform(platform: Platform): Promise<Platform> {
@@ -39,9 +53,8 @@ export async function linkPlatform(platform: Platform): Promise<Platform> {
     await delay(300);
     return platform;
   }
-  if (platform !== "steam") throw new Error("Esta plataforma llegará pronto.");
-  const status = await getSteamStatus();
-  if (!status.detected) throw new Error("No encontramos Steam en este equipo. Instálalo e inicia sesión una vez.");
+  const status = await getPlatformsStatus();
+  if (!status[platform]) throw new Error(NOT_FOUND_MESSAGES[platform]);
   return platform;
 }
 

@@ -5,6 +5,16 @@ import { getCachedLibrary, syncLibrary } from "../lib/library";
 import { errorMessage } from "../lib/tauri";
 import type { Game, LightModePreference, Platform, Theme } from "../types";
 
+/** Filtros del panel izquierdo de la biblioteca (§6.2). */
+export interface LibraryFilters {
+  /** Vacío = todas las plataformas vinculadas. */
+  platforms: Platform[];
+  installedOnly: boolean;
+  recentOnly: boolean;
+}
+
+export const NO_FILTERS: LibraryFilters = { platforms: [], installedOnly: false, recentOnly: false };
+
 // localStorage puede fallar (modo privado, almacenamiento bloqueado): nunca romper la app.
 const safeStorage: StateStorage = {
   getItem: (name) => {
@@ -36,6 +46,7 @@ interface AppState {
   linkedPlatforms: Platform[];
   lightModePref: LightModePreference;
   theme: Theme;
+  filters: LibraryFilters;
 
   // Sesión actual
   games: Game[];
@@ -56,6 +67,8 @@ interface AppState {
   openSearch: () => void;
   closeSearch: () => void;
   setQuery: (query: string) => void;
+  togglePlatformFilter: (platform: Platform) => void;
+  setFilters: (filters: Partial<LibraryFilters>) => void;
 }
 
 export const useAppStore = create<AppState>()(
@@ -65,6 +78,7 @@ export const useAppStore = create<AppState>()(
       linkedPlatforms: [],
       lightModePref: "ask",
       theme: "dark",
+      filters: NO_FILTERS,
 
       games: [],
       libraryStatus: "idle",
@@ -118,6 +132,16 @@ export const useAppStore = create<AppState>()(
       openSearch: () => set({ searchOpen: true }),
       closeSearch: () => set({ searchOpen: false, query: "" }),
       setQuery: (query) => set({ query }),
+      togglePlatformFilter: (platform) =>
+        set((s) => ({
+          filters: {
+            ...s.filters,
+            platforms: s.filters.platforms.includes(platform)
+              ? s.filters.platforms.filter((p) => p !== platform)
+              : [...s.filters.platforms, platform],
+          },
+        })),
+      setFilters: (filters) => set((s) => ({ filters: { ...s.filters, ...filters } })),
     }),
     {
       name: "lphoton-settings",
@@ -130,6 +154,7 @@ export const useAppStore = create<AppState>()(
           ...current,
           ...saved,
           linkedPlatforms: (saved.linkedPlatforms ?? []).filter(isPlatformAvailable),
+          filters: { ...NO_FILTERS, ...saved.filters },
         };
       },
       partialize: (s) => ({
@@ -137,6 +162,7 @@ export const useAppStore = create<AppState>()(
         linkedPlatforms: s.linkedPlatforms,
         lightModePref: s.lightModePref,
         theme: s.theme,
+        filters: s.filters,
       }),
     },
   ),

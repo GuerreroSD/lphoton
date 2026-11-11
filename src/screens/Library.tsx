@@ -2,10 +2,11 @@ import { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { GameCover } from "../components/GameCover";
 import { GameListItem } from "../components/GameListItem";
+import { LibraryFilters } from "../components/LibraryFilters";
 import { Toast } from "../components/Toast";
 import { reportStartup } from "../lib/library";
 import { useAppStore } from "../store/appStore";
-import { matchesQuery, useLibrary } from "../store/useLibrary";
+import { matchesFilters, matchesQuery, useLibrary } from "../store/useLibrary";
 import styles from "./Library.module.css";
 
 // RNF7: se mide una sola vez, en el primer pintado con la biblioteca visible.
@@ -20,6 +21,8 @@ export function Library() {
   const closeSearch = useAppStore((s) => s.closeSearch);
   const syncing = useAppStore((s) => s.syncing);
   const syncWarning = useAppStore((s) => s.syncWarning);
+  const filters = useAppStore((s) => s.filters);
+  const linked = useAppStore((s) => s.linkedPlatforms);
   const searchRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -35,8 +38,9 @@ export function Library() {
     if (searchOpen) searchRef.current?.focus();
   }, [searchOpen]);
 
-  const list = alphabetical.filter((e) => matchesQuery(e.game, query));
-  const grid = recent.filter((e) => matchesQuery(e.game, query));
+  const visible = (e: (typeof alphabetical)[number]) => matchesQuery(e.game, query) && matchesFilters(e, filters);
+  const list = alphabetical.filter(visible);
+  const grid = recent.filter(visible);
 
   return (
     <div className={styles.library}>
@@ -61,6 +65,7 @@ export function Library() {
             />
           </div>
         )}
+        <LibraryFilters platforms={linked} count={list.length} />
         <ul className={styles.list}>
           {list.map((e) => (
             <GameListItem key={e.game.id} game={e.game} platforms={e.platforms} />
@@ -68,7 +73,7 @@ export function Library() {
         </ul>
         {status === "ready" && list.length === 0 && (
           <p className={styles.empty}>
-            {query ? "No hay juegos que coincidan." : syncing ? "Buscando tus juegos…" : "No encontramos juegos en tus plataformas vinculadas."}
+            {query || alphabetical.length > 0 ? "No hay juegos que coincidan." : syncing ? "Buscando tus juegos…" : "No encontramos juegos en tus plataformas vinculadas."}
           </p>
         )}
         <div className={styles.status}>

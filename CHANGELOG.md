@@ -1,5 +1,35 @@
 # Changelog
 
+## [0.3.0] – 2026-11-11 · Fase 3: Epic, GOG y fusión
+
+### Backend (Rust)
+- **Epic Games** (`library/epic.rs`): lee los manifiestos `%ProgramData%\Epic\EpicGamesLauncher\Data\Manifests\*.item`. Solo cuenta juegos (`AppCategories` incluye `games`) y descarta aplicaciones como Discord, DLC e instalaciones incompletas. Lanzamiento silencioso con `com.epicgames.launcher://apps/<ns>%3A<item>%3A<app>?action=launch&silent=true`, validando el identificador para evitar inyección en la URI.
+- **GOG** (`library/gog.rs`):
+  - Base de GOG Galaxy `galaxy-2.1.db`, leída desde una **copia temporal** para no bloquear Galaxy: títulos, biblioteca (solo releases `gog_`), minutos jugados, última sesión e instalados. Las consultas toleran tablas faltantes de otras versiones de Galaxy.
+  - Registro `HKLM\SOFTWARE\WOW6432Node\GOG.com\Games`: también detecta juegos de instaladores offline, sin Galaxy.
+  - Lanzamiento **directo del .exe** según la `playTask` principal de `goggame-<id>.info` (ruta, argumentos y carpeta de trabajo), sin abrir Galaxy.
+  - API pública v2 (`api.gog.com/v2/games/<id>`): portada vertical, fondo, género, desarrollador y año.
+- **Fusión** (`merge.rs`): el mismo título normalizado en varias tiendas queda como **un solo juego con varias `sources`**. Steam se procesa primero para conservar su id y su portada.
+- Protocolo `cover://` ampliado a GOG (`/gog/<id>/cover|hero`), con caché en disco igual que Steam.
+- `get_game_details` recibe plataforma + id y elige la fuente: Steam → appdetails, GOG → API v2, Epic → sin datos (no hay API pública).
+- Nuevo comando `platforms_status` (qué clientes están instalados). Cada lanzamiento queda en `lphoton.log` (`launch platform=… id=… ok|error`).
+- 17 tests unitarios (antes 11): manifiestos de Epic, URI de lanzamiento, base de Galaxy sintética, `goggame-*.info`, fechas de Galaxy, fusión entre tiendas. Además, pruebas manuales `real_epic` y `real_gog_api` (`cargo test real_ -- --ignored --nocapture`).
+
+### Frontend
+- Se pueden vincular **Epic y GOG** en Login y Configuraciones, verificando que el cliente o sus juegos existan en el equipo. Si no, aparece un mensaje claro.
+- **Filtros del panel izquierdo** (§6.2): por plataforma (solo las vinculadas), *Instalados* y *Recientes* (últimos 30 días), con un conteo y la opción "Quitar filtros". Se recuerdan entre sesiones.
+- Portadas y detalles con prioridad Steam → GOG → Epic. Los juegos solo de Epic usan el placeholder sin hacer pedidos de red.
+
+### Verificación
+- `cargo test` ✔ (17) · `npx tsc -b` ✔ · `npm run lint` ✔ · `npm run build` ✔.
+- Equipo real: Epic detectado (Fortnite sí, Discord descartado). En la app, Fortnite aparece con su ficha "PLATAFORMA: EPIC GAMES". GOG no está instalado en este equipo: la lectura se verificó con una base de Galaxy sintética y la API real de GOG (The Witcher: portada, fondo, género, desarrollador y año correctos).
+- Modo demo: *Resident Evil Requiem* aparece una sola vez con los íconos de Epic y Steam, y el filtro "Epic Games" lo muestra solo a él.
+
+### Limitaciones conocidas
+- **Epic** no tiene API pública: sin portada (placeholder), sin descripción, sin horas jugadas ni última sesión. Por eso sus juegos nunca entran en "Recientes".
+- La descripción de GOG llega en inglés (la API no la traduce). El género sí viene en español.
+- El lanzamiento de juegos de GOG no se probó en un equipo real (no hay juegos de GOG instalados aquí).
+
 ## [0.2.0] – 2026-11-11 · Fase 2: Steam
 
 ### Backend (Rust)

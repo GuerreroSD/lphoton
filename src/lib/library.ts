@@ -11,12 +11,26 @@ const mock = mockGames as Game[];
 /** Juego tal como lo envía Rust: sin URLs de imágenes (se calculan aquí). */
 type RawGame = Omit<Game, "coverUrl" | "heroUrl">;
 
+/** Prioridad para portadas y detalles: Steam y GOG tienen API pública; Epic no. */
+const ART_PRIORITY: Platform[] = ["steam", "gog", "epic"];
+
+/** Fuente de la que se toman portada y detalles. */
+export function artSource(game: Pick<Game, "sources">) {
+  for (const platform of ART_PRIORITY) {
+    const src = game.sources.find((s) => s.platform === platform);
+    if (src) return src;
+  }
+  return game.sources[0];
+}
+
 function withImages(game: RawGame): Game {
-  const src = game.sources.find((s) => s.platform === "steam") ?? game.sources[0];
+  const src = artSource(game);
+  // Epic no tiene imágenes públicas: se usa directamente el placeholder.
+  const hasArt = src && src.platform !== "epic";
   return {
     ...game,
-    coverUrl: src ? coverSrc(src.platform, src.externalId, "cover") : "",
-    heroUrl: src ? coverSrc(src.platform, src.externalId, "hero") : "",
+    coverUrl: hasArt ? coverSrc(src.platform, src.externalId, "cover") : "",
+    heroUrl: hasArt ? coverSrc(src.platform, src.externalId, "hero") : "",
   };
 }
 
@@ -62,7 +76,9 @@ export async function getGameDetails(game: Game): Promise<GameDetails> {
     const { description, genre, developer, protagonist, releaseYear } = game;
     return { description, genre, developer, protagonist, releaseYear };
   }
-  return invoke<GameDetails>("get_game_details", { id: game.id });
+  const src = artSource(game);
+  if (!src) return {};
+  return invoke<GameDetails>("get_game_details", { platform: src.platform, externalId: src.externalId });
 }
 
 /** Cantidad de juegos detectados para las plataformas indicadas. */

@@ -349,7 +349,7 @@ pub async fn app_details(client: &reqwest::Client, appid: u32) -> Result<GameDet
 }
 
 /// La tienda devuelve HTML y entidades en las descripciones.
-fn clean_html(input: &str) -> String {
+pub fn clean_html(input: &str) -> String {
     let mut out = String::with_capacity(input.len());
     let mut in_tag = false;
     for c in input.chars() {

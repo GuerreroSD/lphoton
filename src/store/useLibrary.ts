@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from "react";
 import { compareTitles, lastPlayedAt } from "../lib/library";
 import type { Game, Platform } from "../types";
-import { useAppStore } from "./appStore";
+import { useAppStore, type LibraryFilters } from "./appStore";
 
 export interface LibraryEntry {
   game: Game;
@@ -43,6 +43,17 @@ export function useLibrary() {
   );
 
   return { status, entries, alphabetical, recent };
+}
+
+/** "Jugados recientemente": última sesión en los últimos 30 días. */
+const RECENT_MS = 30 * 24 * 60 * 60 * 1000;
+
+export function matchesFilters(entry: LibraryEntry, filters: LibraryFilters, now = Date.now()): boolean {
+  const sources = entry.game.sources.filter((s) => entry.platforms.includes(s.platform));
+  if (filters.platforms.length > 0 && !entry.platforms.some((p) => filters.platforms.includes(p))) return false;
+  if (filters.installedOnly && !sources.some((s) => s.installed)) return false;
+  if (filters.recentOnly && !(now - lastPlayedAt(entry.game) < RECENT_MS)) return false;
+  return true;
 }
 
 export function matchesQuery(game: Game, query: string): boolean {

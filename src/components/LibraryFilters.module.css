@@ -1,0 +1,62 @@
+.filters {
+  margin: 0 0 var(--space-4);
+  padding: 0 var(--space-1) var(--space-4);
+  border-bottom: 1px solid var(--divider);
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  height: 28px;
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  box-shadow: inset 0 0 0 1px var(--border-subtle);
+  color: var(--color-accent);
+  font-family: var(--font-body);
+  font-weight: var(--weight-label);
+  font-size: var(--fs-label);
+  transition: box-shadow var(--duration-base) var(--ease-out);
+}
+
+.chip:hover {
+  box-shadow: inset 0 0 0 1px var(--color-accent);
+}
+
+/* Activo: celeste sobre neutral oscuro invertido (11.28:1). */
+.chip[aria-pressed="true"] {
+  background: var(--color-accent);
+  color: var(--color-bg-dark);
+  box-shadow: none;
+}
+
+.icon {
+  width: 13px;
+  height: 13px;
+}
+
+.summary {
+  margin: var(--space-3) 0 0;
+  color: var(--color-accent);
+  font-weight: var(--weight-label);
+  font-size: var(--fs-label);
+}
+
+.clear {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-accent);
+  font-weight: var(--weight-label);
+  font-size: var(--fs-label);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}

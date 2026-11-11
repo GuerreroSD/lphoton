@@ -3,7 +3,7 @@
 use serde::Serialize;
 use tauri::State;
 
-use crate::library::{self, steam, SyncResult};
+use crate::library::{self, gog, steam, PlatformsStatus, SyncResult};
 use crate::models::{Game, GameDetails, Platform};
 use crate::{credentials, launcher, AppState};
 
@@ -49,26 +49,46 @@ pub async fn sync_library(state: State<'_, AppState>) -> Result<SyncResult, Stri
     Ok(result)
 }
 
-/// Descripción, género, desarrollador y año (tienda de Steam), con caché.
+/// Descripción, género, desarrollador y año (tienda de Steam o API de GOG), con caché.
+/// Epic no tiene API pública: devuelve detalles vacíos.
 #[tauri::command]
-pub async fn get_game_details(state: State<'_, AppState>, id: String) -> Result<GameDetails, String> {
+pub async fn get_game_details(
+    state: State<'_, AppState>,
+    platform: Platform,
+    external_id: String,
+) -> Result<GameDetails, String> {
     let state = state.inner().clone();
+    let prefix = match platform {
+        Platform::Steam => "steam",
+        Platform::Epic => "epic",
+        Platform::Gog => "gog",
+    };
+    let id = format!("{prefix}-{external_id}");
     let lookup_state = state.clone();
     let lookup_id = id.clone();
     if let Some(cached) = blocking(move || lookup_state.db.get_details(&lookup_id)).await?.map_err(|e| e.to_string())? {
         return Ok(cached);
     }
-    let appid: u32 = id
-        .strip_prefix("steam-")
-        .and_then(|a| a.parse().ok())
-        .ok_or("Solo hay detalles para juegos de Steam por ahora.")?;
-    let details = steam::app_details(&state.http, appid)
-        .await
-        .map_err(|e| format!("No pudimos cargar la información del juego ({e})."))?;
+    let details = match platform {
+        Platform::Steam => {
+            let appid: u32 = external_id.parse().map_err(|_| "Identificador de Steam inválido.")?;
+            steam::app_details(&state.http, appid).await
+        }
+        Platform::Gog => gog::details(&state.http, &external_id).await,
+        Platform::Epic => return Ok(GameDetails::default()),
+    }
+    .map_err(|e| format!("No pudimos cargar la información del juego ({e})."))?;
     let save_state = state.clone();
     let to_save = details.clone();
     blocking(move || save_state.db.save_details(&id, &to_save)).await?.map_err(|e| e.to_string())?;
     Ok(details)
+}
+
+/// Qué clientes (Steam, Epic, GOG) están instalados en este equipo.
+#[tauri::command]
+pub async fn platforms_status(state: State<'_, AppState>) -> Result<PlatformsStatus, String> {
+    let state = state.inner().clone();
+    blocking(move || library::platforms_status(&state)).await
 }
 
 #[derive(Serialize)]
