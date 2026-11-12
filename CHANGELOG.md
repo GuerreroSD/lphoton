@@ -1,8 +1,8 @@
 # Changelog
 
-## [0.10.0] – sin instalador publicado · Código abierto, login con Steam y actualizaciones
+## [0.10.0] – 2026-11-12 · Código abierto, login con Steam y actualizaciones
 
-Solo código fuente: el instalador sin firma fue marcado por Windows Defender y no se publicó.
+Publicada como `.exe` **portable**: Windows Defender marca como sospechoso el instalador sin firma, así que no se publicó. El portable se compiló sin el actualizador automático; el código del actualizador está en el repositorio para una versión futura con instalador.
 
 ### Iniciar sesión con Steam
 - El login falso (aceptaba cualquier usuario y contraseña) se reemplaza por **Iniciar sesión con Steam** (OpenID 2.0, sin servidor propio). LPhoton abre la página oficial de Steam en el navegador, recibe la respuesta en un puerto local (127.0.0.1, puerto al azar) y la verifica con Steam (`check_authentication`) antes de aceptar la cuenta. Luego lee el nombre y el avatar públicos.

@@ -9,13 +9,15 @@
 
 ## Descargar
 
-**[Descargar LPhoton para Windows](https://github.com/GuerreroSD/lphoton/releases/latest)** · gratis y de código abierto. En la página del release, descarga `LPhoton_<versión>_x64-setup.exe` (unos 2 MB) en *Assets*. Funciona en Windows 10 u 11 de 64 bits.
+**[Descargar LPhoton 0.10.0 para Windows](https://github.com/GuerreroSD/lphoton/releases/download/v0.10.0/LPhoton_0.10.0_x64_portable.exe)** · gratis y de código abierto, para Windows 10 u 11 de 64 bits.
 
-1. Abre el archivo descargado. El instalador no está firmado, así que Windows puede mostrar el aviso "Windows protegió su PC": elige **Más información** y luego **Ejecutar de todas formas**.
-2. Sigue el instalador. Se instala solo para tu usuario y no pide permisos de administrador.
-3. Abre LPhoton, **inicia sesión con Steam** (o continúa con un perfil local) y vincula las plataformas que tengas instaladas (Steam, Epic Games o GOG Galaxy).
+La 0.10.0 es **portable**: un solo `.exe` que se abre sin instalar.
 
-> El instalador publicado es el de la **versión 0.9.0**. La 0.10.0 (iniciar sesión con Steam y actualizaciones automáticas) está en este repositorio como código fuente, pero aún no tiene instalador: Windows Defender marcó el instalador sin firma como sospechoso. Puedes compilarla tú (ver [Compilar el instalador](#compilar-el-instalador)).
+1. Si tienes otra versión de LPhoton abierta, ciérrala del todo: clic derecho en su ícono de la bandeja → **Salir**.
+2. Abre el archivo descargado. No está firmado, así que Windows puede mostrar el aviso "Windows protegió su PC": elige **Más información** y luego **Ejecutar de todas formas**.
+3. **Inicia sesión con Steam** (o continúa con un perfil local) y vincula las plataformas que tengas instaladas (Steam, Epic Games o GOG Galaxy).
+
+> **¿Por qué no hay instalador?** Windows Defender marca como sospechoso el instalador sin firma de la 0.10.0 (el programa en sí no), así que se publica solo el `.exe`. Esta versión no trae actualizaciones automáticas. Si prefieres instalarlo, el último instalador es el de la [versión 0.9.0](https://github.com/GuerreroSD/lphoton/releases/tag/v0.9.0), sin el login con Steam.
 
 ---
 
