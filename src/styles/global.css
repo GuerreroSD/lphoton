@@ -55,6 +55,19 @@ img {
   white-space: nowrap;
 }
 
+::selection {
+  background: var(--color-accent);
+  color: var(--color-bg-dark);
+}
+
+/* Entrada suave de cada pantalla (solo opacity y transform, ≤150 ms). */
+@keyframes screen-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
 /* Scrollbars discretas */
 * {
   scrollbar-width: thin;

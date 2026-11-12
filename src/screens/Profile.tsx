@@ -111,6 +111,10 @@ export function Profile() {
                   <span className={styles.rank}>{i + 1}</span>
                   <span className={styles.topTitle}>{game.title}</span>
                   <span className={styles.topHours}>{formatHours(m)}</span>
+                  {/* Barra proporcional a las horas del más jugado. */}
+                  <span className={styles.topBar} aria-hidden="true">
+                    <span style={{ transform: `scaleX(${m / topPlayed[0].minutes})` }} />
+                  </span>
                 </Link>
               </li>
             ))}
@@ -137,6 +141,9 @@ function UsernameField() {
   if (!editing) {
     return (
       <div className={styles.nameRow}>
+        <span className={styles.avatar} aria-hidden="true">
+          {(username ?? "Invitado").trim().charAt(0).toUpperCase() || "?"}
+        </span>
         <span className={styles.name}>{username ?? "Invitado"}</span>
         <TextButton
           onClick={() => {

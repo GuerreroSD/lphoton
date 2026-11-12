@@ -1,5 +1,36 @@
 # Changelog
 
+## [0.8.0] – 2026-11-12 · Mejoras de interfaz
+
+Pulido general sin salir de la guía de estilos: mismos colores, tipografías y componentes. Las transiciones siguen usando solo `transform`, `opacity` y `box-shadow` (≤150 ms).
+
+### La interfaz crece con la ventana
+- Los tamaños de texto parten de los valores de la guía (24 / 16 / 12 px) y crecen un poco en ventanas grandes (`clamp`). A 1280 px todo se ve igual que en las maquetas; maximizado ya no queda diminuto.
+- **Biblioteca**: las portadas ocupan todo el ancho disponible (4 columnas a 1280 px, 5 a 1920 px) en vez de 3 columnas fijas con márgenes vacíos. El panel izquierdo también se ensancha.
+- **Ficha**: crece hasta 1280 px de ancho, pero nunca más de lo que cabe a lo alto, para que JUGAR quede siempre a la vista.
+- **Configuraciones, Perfil y Foros**: la columna de contenido se ensancha con la ventana.
+
+### Biblioteca
+- Al pasar el mouse (o con el foco del teclado), la portada se eleva y muestra una franja con el **nombre del juego y sus tiendas**.
+- Los juegos **sin instalar** llevan una marca de descarga en la portada y se ven atenuados en la lista, para ubicar rápido los que ya se pueden jugar.
+- El contador de juegos se ve siempre, no solo con filtros activos.
+- Estado vacío en el área de portadas ("Ningún juego coincide" + "Ver toda la biblioteca") y silueta de la grilla mientras carga.
+- **Ctrl+K** o **Ctrl+F** abren la búsqueda desde cualquier pantalla.
+
+### Ficha del juego
+- Muestra el **nombre del juego** y los íconos de sus tiendas sobre la descripción. Las imágenes de Steam no traen el título, así que antes no se veía en ninguna parte.
+
+### Configuraciones y Perfil
+- Cada sección es una **tarjeta**, y en ventanas de 1200 px o más hay un **índice lateral** para saltar entre secciones (marca la que está a la vista).
+- Los textos de ayuda usan el neutral claro `#DBC5DD` (nuevo token `--text-muted`, contraste de 8.9:1 o más) para distinguirse de los títulos y controles, que siguen en celeste. En modo claro usa el morado intenso atenuado (5.4:1 o más).
+- Perfil: inicial del usuario junto al nombre y una barra proporcional a las horas en "Más jugados".
+- Corregido: el ícono de Epic Games desaparecía cuando el botón de plataforma quedaba angosto.
+
+### Detalles
+- Entrada suave (150 ms) al cambiar de pantalla.
+- Las filas de las listas se resaltan al pasar el mouse.
+- Tokens nuevos: `--text-muted`, `--surface-raised`, `--surface-hover`, `--cover-scrim`, `--cover-min`, `--page-width`, `--shadow-row-active`.
+
 ## [0.7.0] – 2026-11-11 · Instalar juegos y barra responsiva
 
 ### Instalar juegos no instalados

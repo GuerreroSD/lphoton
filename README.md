@@ -20,7 +20,7 @@ Si tienes poco tiempo para jugar, no quieres perderlo cerrando publicidad, esper
 
 | | |
 |---|---|
-| **Biblioteca unificada** | Junta Steam, Epic Games y GOG. Si un juego está en dos tiendas, aparece una sola vez con ambos íconos. Tiene filtros por plataforma, instalados y recientes, y una búsqueda rápida. |
+| **Biblioteca unificada** | Junta Steam, Epic Games y GOG. Si un juego está en dos tiendas, aparece una sola vez con ambos íconos. Tiene filtros por plataforma, instalados y recientes, y una búsqueda rápida (Ctrl+K). Los juegos sin instalar se distinguen de un vistazo. |
 | **Inicio silencioso** | Abre el cliente de la tienda en segundo plano, sin ventanas, y lanza el juego. La pantalla de carga avanza con eventos reales: cliente iniciado → licencia validada → juego detectado → modo ligero. |
 | **Modo ligero** | Mientras juegas, baja la prioridad y libera la RAM de los procesos auxiliares (`steamwebhelper.exe` y similares). Al cerrar el juego, todo vuelve a la normalidad. Nunca toca el proceso principal del cliente, para no romper el DRM ni el guardado en la nube. |
 | **Instalar juegos** | Para los juegos que tienes pero no están instalados, el botón **INSTALAR** abre la descarga en su tienda. En Steam, la ficha muestra el progreso real de la descarga. |

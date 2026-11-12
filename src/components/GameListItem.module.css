@@ -1,9 +1,9 @@
 .item {
   display: grid;
-  grid-template-columns: minmax(0, 204px) auto;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   column-gap: var(--space-4);
-  min-height: 38px;
+  min-height: clamp(38px, 2.6vw, 44px);
   padding: var(--space-1) var(--space-3);
   border-radius: var(--radius-sm);
   color: var(--color-accent);
@@ -14,7 +14,18 @@
 .item:hover,
 .item:focus-visible {
   outline: none;
-  box-shadow: inset 2px 0 0 var(--color-accent);
+  background: var(--surface-hover);
+  box-shadow: var(--shadow-row-active);
+}
+
+/* Sin instalar: atenuado (5.0:1 sobre el neutral oscuro). */
+.notInstalled {
+  color: var(--state-disabled-text);
+}
+
+.notInstalled:hover,
+.notInstalled:focus-visible {
+  color: var(--color-accent);
 }
 
 .title {

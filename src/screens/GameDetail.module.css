@@ -4,8 +4,12 @@
   overflow-y: auto;
 }
 
+/*
+ * La ficha crece con la ventana, pero nunca más de lo que cabe a lo alto:
+ * así el botón JUGAR queda siempre a la vista, sin desplazarse.
+ */
 .frame {
-  width: min(960px, 100%);
+  width: min(100%, clamp(720px, calc((100vh - 430px) * 2.58), 1280px));
   margin: 0 auto;
 }
 
@@ -79,10 +83,10 @@
 
 .info {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) minmax(200px, 240px);
-  gap: var(--space-5);
+  grid-template-columns: auto minmax(0, 1fr) minmax(220px, 24%);
+  gap: var(--space-5) clamp(var(--space-5), 2.4vw, var(--space-7));
   align-items: start;
-  padding: var(--space-3) var(--space-5) var(--space-5);
+  padding: var(--space-4) var(--space-5) var(--space-5);
 }
 
 .play {
@@ -91,6 +95,24 @@
 
 .text {
   min-width: 0;
+}
+
+/* Nombre del juego y sus tiendas (las imágenes de las tiendas no siempre lo traen). */
+.heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+  margin-bottom: var(--space-2);
+}
+
+.title {
+  margin: 0;
+  color: var(--color-accent);
+  font-family: var(--font-title);
+  font-weight: var(--weight-title);
+  font-size: var(--fs-title-sm);
+  line-height: var(--lh-tight);
 }
 
 /* Estado de la instalación (sobre la descripción). */
@@ -142,7 +164,7 @@
   color: var(--color-accent);
   font-weight: var(--weight-label);
   font-size: var(--fs-label);
-  line-height: 1.5;
+  line-height: 1.6;
 }
 
 .meta li::before {

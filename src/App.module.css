@@ -10,3 +10,10 @@
   flex: 1;
   min-height: 0;
 }
+
+/* La pantalla entra con un fundido corto al cambiar de sección. */
+.screen {
+  position: relative;
+  height: 100%;
+  animation: screen-in var(--duration-base) var(--ease-out);
+}

@@ -25,7 +25,7 @@
 
 .searchInput {
   width: 100%;
-  height: 40px;
+  height: clamp(40px, 2.6vw, 46px);
   padding: 0 var(--space-3);
   border: 0;
   border-radius: var(--radius-md);
@@ -48,24 +48,53 @@
 .content {
   flex: 1;
   min-width: 0;
-  padding: var(--space-6) var(--space-6) var(--space-7);
+  padding: var(--space-6) clamp(var(--space-6), 3vw, var(--space-8)) var(--space-7);
   overflow-y: auto;
 }
 
+/*
+ * Las portadas ocupan todo el ancho disponible: entran tantas columnas como
+ * quepan y se reparten el espacio, sin márgenes vacíos a los lados.
+ */
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, var(--cover-width));
-  justify-content: center;
-  gap: var(--space-5) var(--space-7);
-  max-width: calc(var(--cover-width) * 3 + var(--space-7) * 2);
-  margin: 0 auto;
+  grid-template-columns: repeat(auto-fill, minmax(var(--cover-min), 1fr));
+  gap: clamp(var(--space-5), 2vw, var(--space-6)) clamp(var(--space-5), 2.2vw, var(--space-7));
 }
 
-/* Con ventanas anchas se permiten más columnas. */
-@media (min-width: 1500px) {
-  .grid {
-    max-width: none;
-  }
+.skeleton {
+  aspect-ratio: 2 / 3;
+  border-radius: var(--radius-sm);
+  background: var(--cover-placeholder);
+}
+
+/* Estado vacío del área de portadas. */
+.blank {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-8) var(--space-5);
+  text-align: center;
+}
+
+.blankTitle {
+  margin: 0;
+  color: var(--color-accent);
+  font-family: var(--font-title);
+  font-weight: var(--weight-title);
+  font-size: var(--fs-title-sm);
+}
+
+.blankText {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: var(--fs-body-sm);
+}
+
+.blankText a {
+  color: var(--color-accent);
+  font-weight: var(--weight-label);
 }
 
 .empty {

@@ -159,6 +159,7 @@
 }
 
 .platform .icon {
+  flex: none;
   width: 20px;
   height: 20px;
   color: var(--platform-icon);

@@ -14,7 +14,7 @@
   display: inline-flex;
   align-items: center;
   gap: var(--space-1);
-  height: 28px;
+  height: clamp(28px, 1.9vw, 34px);
   padding: 0 var(--space-3);
   border: 0;
   border-radius: var(--radius-pill);
@@ -24,11 +24,17 @@
   font-family: var(--font-body);
   font-weight: var(--weight-label);
   font-size: var(--fs-label);
-  transition: box-shadow var(--duration-base) var(--ease-out);
+  transition:
+    box-shadow var(--duration-base) var(--ease-out),
+    transform var(--duration-fast) var(--ease-out);
 }
 
 .chip:hover {
   box-shadow: inset 0 0 0 1px var(--color-accent);
+}
+
+.chip:active {
+  transform: scale(0.96);
 }
 
 /* Activo: celeste sobre neutral oscuro invertido (11.28:1). */
@@ -45,7 +51,7 @@
 
 .summary {
   margin: var(--space-3) 0 0;
-  color: var(--color-accent);
+  color: var(--text-muted);
   font-weight: var(--weight-label);
   font-size: var(--fs-label);
 }

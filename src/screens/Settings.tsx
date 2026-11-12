@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { PlatformLinkButton, TextButton } from "../components/Button";
 import { Segmented, Switch } from "../components/Choice";
 import { PlatformBadge } from "../components/PlatformBadge";
@@ -45,8 +45,21 @@ const THEME_OPTIONS: { value: Theme; label: string }[] = [
 
 /** Configuraciones (§6.7). */
 export function Settings() {
+  const hasSteamSection = useAppStore((s) => inTauri && s.linkedPlatforms.includes("steam"));
+  const sections = useMemo(
+    () => [
+      { id: "settings-platforms", label: "Plataformas" },
+      ...(hasSteamSection ? [{ id: "settings-steam", label: "Steam" }] : []),
+      { id: "settings-lightmode", label: "Modo ligero" },
+      { id: "settings-theme", label: "Apariencia" },
+      { id: "settings-startup", label: "Inicio" },
+      { id: "settings-paths", label: "Rutas de instalación" },
+      { id: "settings-about", label: "Acerca de" },
+    ],
+    [hasSteamSection],
+  );
   return (
-    <SectionPage title="Configuraciones">
+    <SectionPage title="Configuraciones" sections={sections}>
       <PlatformsSection />
       <LightModeSection />
       <AppearanceSection />

@@ -14,7 +14,13 @@
   color: var(--color-accent);
   font-weight: var(--weight-label);
   font-size: var(--fs-label);
-  transition: box-shadow var(--duration-base) var(--ease-out);
+  transition:
+    box-shadow var(--duration-base) var(--ease-out),
+    transform var(--duration-fast) var(--ease-out);
+}
+
+.option:active {
+  transform: scale(0.96);
 }
 
 .option:hover {
@@ -66,7 +72,7 @@
 }
 
 .switchDescription {
-  color: var(--state-disabled-text);
+  color: var(--text-muted);
   font-size: var(--fs-label);
   line-height: var(--lh-body);
 }

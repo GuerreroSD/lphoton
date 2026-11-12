@@ -71,7 +71,7 @@
   justify-content: space-between;
   gap: var(--space-3);
   width: 100%;
-  min-height: 38px;
+  min-height: clamp(38px, 2.6vw, 44px);
   padding: var(--space-1) var(--space-3);
   border: 0;
   border-radius: var(--radius-sm);
@@ -83,7 +83,11 @@
 
 .item:hover,
 .item[aria-current="true"] {
-  box-shadow: inset 2px 0 0 var(--color-accent);
+  box-shadow: var(--shadow-row-active);
+}
+
+.item:hover {
+  background: var(--surface-hover);
 }
 
 .item[aria-current="true"] {
@@ -113,7 +117,7 @@
 .content {
   flex: 1;
   min-width: 0;
-  padding: var(--space-6) var(--space-6) var(--space-7);
+  padding: var(--space-6) clamp(var(--space-6), 3vw, var(--space-8)) var(--space-7);
   overflow-y: auto;
 }
 
@@ -121,7 +125,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
-  width: min(820px, 100%);
+  width: min(var(--page-width), 100%);
   margin: 0 auto;
 }
 
@@ -159,7 +163,7 @@
 
 .empty {
   margin: 0;
-  color: var(--color-accent);
+  color: var(--text-muted);
   font-size: var(--fs-body-sm);
 }
 
@@ -178,7 +182,8 @@
   gap: var(--space-4);
   padding: var(--space-4);
   border-radius: var(--radius-lg);
-  box-shadow: inset 0 0 0 1px var(--border-subtle);
+  background: var(--surface-raised);
+  box-shadow: inset 0 0 0 1px var(--divider);
 }
 
 .votes {
@@ -243,7 +248,7 @@
 
 .fixDescription {
   margin: 0;
-  color: var(--color-accent);
+  color: var(--text-muted);
   font-size: var(--fs-body-sm);
   line-height: var(--lh-body);
   white-space: pre-wrap;
@@ -295,6 +300,7 @@
   gap: var(--space-3);
   padding: var(--space-4);
   border-radius: var(--radius-lg);
+  background: var(--surface-raised);
   box-shadow: inset 0 0 0 1px var(--color-accent);
 }
 

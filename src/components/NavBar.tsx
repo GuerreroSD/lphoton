@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAppStore } from "../store/appStore";
 import { NavButton, SearchIcon } from "./Button";
@@ -39,6 +40,23 @@ export function NavBar({ demoSelected }: NavBarProps) {
     }
   };
 
+  // Ctrl+K o Ctrl+F abren la búsqueda desde cualquier pantalla.
+  useEffect(() => {
+    if (isDemo) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (!(e.ctrlKey || e.metaKey) || e.altKey) return;
+      const key = e.key.toLowerCase();
+      if (key !== "k" && key !== "f") return;
+      e.preventDefault();
+      openSearch();
+      navigate("/biblioteca");
+      // Si ya estaba abierta, se devuelve el foco al campo.
+      requestAnimationFrame(() => document.getElementById("library-search")?.focus());
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [isDemo, openSearch, navigate]);
+
   return (
     <header className={styles.navbar}>
       {isDemo ? (
@@ -61,7 +79,7 @@ export function NavBar({ demoSelected }: NavBarProps) {
           ),
         )}
       </nav>
-      <SearchIcon onClick={onSearch} active={!isDemo && searchOpen} />
+      <SearchIcon onClick={onSearch} active={!isDemo && searchOpen} title={isDemo ? undefined : "Buscar (Ctrl+K)"} />
     </header>
   );
 }

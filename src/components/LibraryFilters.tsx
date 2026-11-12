@@ -52,14 +52,17 @@ export function LibraryFilters({ platforms, count }: LibraryFiltersProps) {
           Recientes
         </button>
       </div>
-      {active && (
-        <p className={styles.summary}>
-          {count} {count === 1 ? "juego" : "juegos"} ·{" "}
-          <button type="button" className={styles.clear} onClick={() => setFilters(NO_FILTERS)}>
-            Quitar filtros
-          </button>
-        </p>
-      )}
+      <p className={styles.summary} aria-live="polite">
+        {count} {count === 1 ? "juego" : "juegos"}
+        {active && (
+          <>
+            {" · "}
+            <button type="button" className={styles.clear} onClick={() => setFilters(NO_FILTERS)}>
+              Quitar filtros
+            </button>
+          </>
+        )}
+      </p>
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import { useLayoutEffect } from "react";
-import { BrowserRouter, Navigate, Outlet, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Outlet, Route, Routes, useLocation } from "react-router-dom";
 import { NavBar } from "./components/NavBar";
 import { useAppStore } from "./store/appStore";
 import { DevComponents } from "./screens/DevComponents";
@@ -19,11 +19,15 @@ function RequireLinked() {
 }
 
 function MainLayout() {
+  const { pathname } = useLocation();
   return (
     <div className={styles.shell}>
       <NavBar />
       <main className={styles.main}>
-        <Outlet />
+        {/* key: la animación de entrada se repite al cambiar de pantalla. */}
+        <div key={pathname} className={styles.screen}>
+          <Outlet />
+        </div>
       </main>
     </div>
   );

@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { BackGlyph } from "../assets/icons/icons";
 import { InstallButton, LightModeButton, PlayButton, SkipButton } from "../components/Button";
 import { Dialog } from "../components/Dialog";
+import { PlatformBadges } from "../components/PlatformBadge";
 import { ProgressBar } from "../components/ProgressBar";
 import { formatBytes, getInstallStatus, installGame, type InstallStatus } from "../lib/install";
 import { checkClientLoad } from "../lib/lightmode";
@@ -281,6 +282,10 @@ export function GameDetail() {
               <PlayButton onClick={onPlay} disabled={!platform || checking} className={styles.play} />
             )}
             <div className={styles.text}>
+              <div className={styles.heading}>
+                <h1 className={styles.title}>{game.title}</h1>
+                <PlatformBadges platforms={entry?.platforms ?? []} />
+              </div>
               {needsInstall && platform && (
                 <InstallInfo
                   platform={platform}
@@ -289,7 +294,6 @@ export function GameDetail() {
                   error={installer.error}
                 />
               )}
-              <h1 className="visually-hidden">{game.title}</h1>
               <p className={styles.description}>
                 {details?.description ??
                   (detailsState?.error

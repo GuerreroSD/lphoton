@@ -51,7 +51,10 @@
   --surface-navbar: var(--color-navbar);
   --surface-chip: var(--color-navbar); /* tarjeta lavanda de la pantalla de carga */
   --surface-dev: var(--color-bg-light); /* fondo de la página de componentes (maqueta 00) */
+  --surface-raised: rgb(var(--palette-navbar-rgb) / 0.07); /* tarjetas y filas resaltadas */
+  --surface-hover: rgb(var(--palette-accent-rgb) / 0.08); /* fila bajo el cursor */
   --text-strong: var(--color-accent); /* texto principal sobre fondos oscuros (11.28:1) */
+  --text-muted: var(--palette-neutral-light); /* texto secundario: ayudas y notas (9.9:1; 8.9:1 en tarjetas) */
   --text-on-chip: var(--color-deep); /* texto sobre lavanda (4.76:1) */
   --text-on-primary: var(--color-bg-dark); /* texto del botón JUGAR (3.28:1, excepción aprobada) */
   --border-container: var(--color-accent);
@@ -59,6 +62,12 @@
   --divider: rgb(var(--palette-navbar-rgb) / 0.35);
   --platform-icon: var(--color-bg-light);
   --cover-placeholder: rgb(var(--palette-navbar-rgb) / 0.12);
+  --cover-scrim: linear-gradient(
+    to top,
+    rgb(var(--palette-neutral-dark-rgb) / 0.96) 0%,
+    rgb(var(--palette-neutral-dark-rgb) / 0.82) 55%,
+    transparent 100%
+  ); /* franja con el nombre sobre la portada (siempre oscura) */
 
   /* Estado "deshabilitado / seleccionado" (maqueta 00) */
   --state-disabled-bg: rgb(var(--palette-neutral-dark-rgb) / 0.4);
@@ -93,12 +102,16 @@
   --fs-display: 75px; /* Display – Faster One */
   --fs-logo-lg: 56px; /* Logo en la pantalla de carga */
   --fs-logo-nav: clamp(30px, 2.8vw, 46px); /* Logo de la navbar: crece con la ventana */
-  --fs-title: 24px; /* Título – Chakra Petch 700 */
-  --fs-title-sm: 18px; /* Títulos de diálogos y estados */
+  /*
+   * El mínimo de cada rol es el valor de la guía (24 / 16 / 12 px). En ventanas
+   * grandes crecen un poco con el ancho para que la interfaz no quede diminuta.
+   */
+  --fs-title: clamp(24px, 1.5vw, 30px); /* Título – Chakra Petch 700 */
+  --fs-title-sm: clamp(18px, 1.15vw, 22px); /* Títulos de diálogos y estados */
   --fs-nav: 14px; /* Botones de navegación (mayúsculas, menor que el título) */
-  --fs-body: 16px; /* Cuerpo – Montserrat 400 */
-  --fs-body-sm: 14px; /* Cuerpo compacto (diálogos, tarjetas) */
-  --fs-label: 12px; /* Etiqueta – Montserrat 600 */
+  --fs-body: clamp(16px, 0.95vw, 18px); /* Cuerpo – Montserrat 400 */
+  --fs-body-sm: clamp(14px, 0.82vw, 16px); /* Cuerpo compacto (diálogos, tarjetas) */
+  --fs-label: clamp(12px, 0.72vw, 14px); /* Etiqueta – Montserrat 600 */
 
   --lh-body: 1.45;
   --lh-tight: 1.2;
@@ -116,7 +129,8 @@
   --shadow-skip-hover: 2px 3px 0 0 rgb(var(--color-alert-rgb) / 0.55), 0 0 10px 0 rgb(var(--color-alert-rgb) / 0.35);
   --shadow-light-hover: 2px 3px 0 0 rgb(var(--color-accent-rgb) / 0.55), 0 0 10px 0 rgb(var(--color-success-rgb) / 0.35);
   --shadow-search-hover: 0 0 14px 0 rgb(var(--color-accent-rgb) / 0.55);
-  --shadow-cover-focus: 0 0 0 2px var(--color-accent);
+  --shadow-cover-focus: 0 0 0 2px var(--color-accent), 0 10px 24px 0 rgb(var(--palette-black-rgb) / 0.4);
+  --shadow-row-active: inset 3px 0 0 var(--color-accent);
   --shadow-card-success: 0 4px 14px 0 rgb(var(--color-success-rgb) / 0.18);
   --shadow-modal: 0 10px 30px 0 rgb(var(--palette-black-rgb) / 0.45);
 
@@ -136,8 +150,10 @@
   --space-8: 64px;
 
   --navbar-height: 96px;
-  --sidebar-width: 340px;
-  --cover-width: 176px;
+  --sidebar-width: clamp(300px, 21vw, 400px);
+  --cover-width: 176px; /* ancho de la maqueta 01 */
+  --cover-min: clamp(176px, 12.5vw, 240px); /* ancho mínimo de columna en la grilla */
+  --page-width: clamp(760px, 58vw, 1080px); /* columna de Configuraciones y Perfil */
   --blur-backdrop: 4px;
 
   color-scheme: dark;
@@ -167,7 +183,10 @@
   --surface-app: var(--palette-neutral-light);
   --surface-container: var(--palette-neutral-light);
   --surface-sunken: rgb(var(--palette-deep-rgb) / 0.07);
+  --surface-raised: rgb(var(--palette-deep-rgb) / 0.05);
+  --surface-hover: rgb(var(--palette-deep-rgb) / 0.08);
   --text-strong: var(--palette-deep);
+  --text-muted: rgb(var(--palette-deep-rgb) / 0.82); /* 5.8:1 sobre el neutral claro; 5.4:1 en tarjetas */
   /* JUGAR conserva el texto oscuro de la maqueta. */
   --text-on-primary: var(--palette-neutral-dark);
   --border-container: var(--palette-deep);
@@ -180,5 +199,6 @@
   --logo-gradient: var(--logo-gradient-on-light);
   --shadow-play-hover: 3px 4px 0 0 rgb(var(--palette-deep-rgb) / 0.9);
   --shadow-modal: 0 10px 30px 0 rgb(var(--palette-deep-rgb) / 0.3);
+  --shadow-cover-focus: 0 0 0 2px var(--palette-deep), 0 10px 24px 0 rgb(var(--palette-deep-rgb) / 0.3);
   color-scheme: light;
 }

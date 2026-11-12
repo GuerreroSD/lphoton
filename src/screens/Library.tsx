@@ -1,12 +1,13 @@
 import { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
+import { TextButton } from "../components/Button";
 import { GameCover } from "../components/GameCover";
 import { GameListItem } from "../components/GameListItem";
 import { LibraryFilters } from "../components/LibraryFilters";
 import { PlatformHint } from "../components/PlatformHint";
 import { Toast } from "../components/Toast";
 import { reportStartup } from "../lib/library";
-import { useAppStore } from "../store/appStore";
+import { NO_FILTERS, useAppStore } from "../store/appStore";
 import { matchesFilters, matchesQuery, useLibrary } from "../store/useLibrary";
 import styles from "./Library.module.css";
 
@@ -23,6 +24,7 @@ export function Library() {
   const syncing = useAppStore((s) => s.syncing);
   const syncWarning = useAppStore((s) => s.syncWarning);
   const filters = useAppStore((s) => s.filters);
+  const setFilters = useAppStore((s) => s.setFilters);
   const linked = useAppStore((s) => s.linkedPlatforms);
   const searchRef = useRef<HTMLInputElement>(null);
 
@@ -73,11 +75,6 @@ export function Library() {
             <GameListItem key={e.game.id} game={e.game} platforms={e.platforms} />
           ))}
         </ul>
-        {status === "ready" && list.length === 0 && (
-          <p className={styles.empty}>
-            {query || alphabetical.length > 0 ? "No hay juegos que coincidan." : syncing ? "Buscando tus juegos…" : "No encontramos juegos en tus plataformas vinculadas."}
-          </p>
-        )}
         <div className={styles.status}>
           {syncing && <p className={styles.syncing}>Sincronizando…</p>}
           {syncWarning && !syncing && (
@@ -89,11 +86,48 @@ export function Library() {
       </aside>
 
       <section className={styles.content} aria-label="Portadas">
-        {status === "loading" && <p className={styles.empty}>Cargando biblioteca…</p>}
         {status === "error" && <p className={styles.empty}>No pudimos cargar tu biblioteca. Intenta de nuevo.</p>}
+        {(status === "loading" || status === "idle") && (
+          // Silueta de la grilla mientras se lee la caché: evita el salto al pintar las portadas.
+          <div className={styles.grid} aria-hidden="true">
+            {Array.from({ length: 10 }, (_, i) => (
+              <span key={i} className={styles.skeleton} />
+            ))}
+          </div>
+        )}
+        {status === "ready" && grid.length === 0 && (
+          <div className={styles.blank} role="status">
+            {alphabetical.length === 0 ? (
+              <>
+                <h2 className={styles.blankTitle}>{syncing ? "Buscando tus juegos…" : "Tu biblioteca está vacía"}</h2>
+                {!syncing && (
+                  <p className={styles.blankText}>
+                    No encontramos juegos en tus plataformas vinculadas.{" "}
+                    <Link to="/configuraciones">Revisar plataformas →</Link>
+                  </p>
+                )}
+              </>
+            ) : (
+              <>
+                <h2 className={styles.blankTitle}>Ningún juego coincide</h2>
+                <p className={styles.blankText}>
+                  {query.trim() ? `No hay resultados para “${query.trim()}”` : "No hay juegos con estos filtros"}.
+                </p>
+                <TextButton
+                  onClick={() => {
+                    setFilters(NO_FILTERS);
+                    setQuery("");
+                  }}
+                >
+                  Ver toda la biblioteca
+                </TextButton>
+              </>
+            )}
+          </div>
+        )}
         <div className={styles.grid}>
           {grid.map((e) => (
-            <GameCover key={e.game.id} game={e.game} />
+            <GameCover key={e.game.id} game={e.game} platforms={e.platforms} />
           ))}
         </div>
       </section>
