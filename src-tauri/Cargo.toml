@@ -1,6 +1,6 @@
 [package]
 name = "lphoton"
-version = "0.8.0"
+version = "0.9.0"
 description = "LPhoton: launcher liviano que unifica Steam, Epic Games y GOG"
 authors = ["Luis Barrios Urbina", "Alan Troncoso Jara"]
 edition = "2021"

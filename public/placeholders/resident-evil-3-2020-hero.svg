@@ -21,8 +21,5 @@
   <rect width="1600" height="620" fill="url(#g1-resident-evil-3-2020-hero)"/>
   <rect width="1600" height="620" fill="url(#g2-resident-evil-3-2020-hero)"/>
   <rect width="1600" height="620" fill="url(#lines-resident-evil-3-2020-hero)"/>
-  <rect x="96" y="200" width="96" height="8" fill="#FF007F"/>
-  <text x="96" y="300" font-family="Chakra Petch, Bahnschrift, Arial Narrow, sans-serif" font-weight="700" font-size="92" fill="#DBC5DD" letter-spacing="3">RESIDENT EVIL</text>
-  <text x="96" y="410" font-family="Chakra Petch, Bahnschrift, Arial Narrow, sans-serif" font-weight="700" font-size="104" fill="#00F0FF" letter-spacing="3">3 (2020)</text>
-  <text x="96" y="560" font-family="Montserrat, Segoe UI, sans-serif" font-weight="600" font-size="24" fill="#DBC5DD" opacity="0.8">IMAGEN DE MUESTRA</text>
+  <text x="1536" y="72" text-anchor="end" font-family="Montserrat, Segoe UI, sans-serif" font-weight="600" font-size="22" fill="#DBC5DD" opacity="0.7">IMAGEN DE MUESTRA</text>
 </svg>

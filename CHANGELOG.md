@@ -1,6 +1,6 @@
 # Changelog
 
-## [Sin publicar] · Rediseño inmersivo
+## [0.9.0] – 2026-11-12 · Rediseño inmersivo
 
 La interfaz deja las maquetas originales y pasa a un launcher visual, al estilo de GOG Galaxy y Steam Big Picture. Sigue usando solo tokens, y las transiciones solo `transform`, `opacity` y `box-shadow`.
 
@@ -28,6 +28,8 @@ La interfaz deja las maquetas originales y pasa a un launcher visual, al estilo 
 - Los nombres de juegos y títulos usan un blanco frío (`--text-primary`); el celeste queda para lo activo y los enlaces.
 - Barras de desplazamiento finas y sin flechas. El contenido se desenfoca más bajo los diálogos.
 - El modo claro conserva todo el rediseño con vidrio claro.
+- Modo demo: los banners de muestra ya no repiten el título, porque la ficha lo escribe encima (igual que con el arte real de las tiendas).
+- README: capturas nuevas en `docs/capturas-0.9/` (las anteriores siguen en `docs/capturas/`) y enlace de descarga del instalador.
 - Tokens nuevos: `--palette-void`, `--palette-ink`, `--text-primary`, `--glass-bg`, `--glass-bg-strong`, `--glass-filter`, `--glass-edge`, `--ambient-*`, `--neon-ring`, `--neon-glow`, `--shadow-cover`, `--radius-xl`, `--shell-gap`, `--duration-smooth`, `--duration-ambient`, `--ease-soft`, `--scrollbar-thumb`.
 
 ## [0.8.0] – 2026-11-12 · Mejoras de interfaz

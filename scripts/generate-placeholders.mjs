@@ -90,20 +90,10 @@ function cover(game, i) {
 
 function hero(game, i) {
   const [w, h] = [1600, 620];
-  const lines = titleLines(game.title);
-  const text = lines
-    .map((line, n) => {
-      const size = n === 0 ? 92 : line.length > 14 ? 64 : 104;
-      const y = 300 + n * 110;
-      const fill = n === 0 ? PALETTE.light : PALETTE.accent;
-      return `<text x="96" y="${y}" font-family="Chakra Petch, Bahnschrift, Arial Narrow, sans-serif" font-weight="700" font-size="${size}" fill="${fill}" letter-spacing="3">${escapeXml(line)}</text>`;
-    })
-    .join("\n  ");
+  // Sin título: la ficha lo escribe sobre el banner, como con el arte real de las tiendas.
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">
   ${defs(`${game.id}-hero`, GLOW_PAIRS[(i + 2) % GLOW_PAIRS.length], w, h)}
-  <rect x="96" y="200" width="96" height="8" fill="${PALETTE.alert}"/>
-  ${text}
-  <text x="96" y="560" font-family="Montserrat, Segoe UI, sans-serif" font-weight="600" font-size="24" fill="${PALETTE.light}" opacity="0.8">IMAGEN DE MUESTRA</text>
+  <text x="${w - 64}" y="72" text-anchor="end" font-family="Montserrat, Segoe UI, sans-serif" font-weight="600" font-size="22" fill="${PALETTE.light}" opacity="0.7">IMAGEN DE MUESTRA</text>
 </svg>
 `;
 }

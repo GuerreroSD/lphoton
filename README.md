@@ -2,10 +2,20 @@
 
 **Launcher de escritorio para Windows que une tus juegos de Steam, Epic Games y GOG en una sola biblioteca.** No tiene anuncios, consume pocos recursos e inicia tus juegos en la menor cantidad de clics.
 
-![Biblioteca de LPhoton](docs/capturas/biblioteca.png)
+![Biblioteca de LPhoton](docs/capturas-0.9/biblioteca.png)
 
 > Proyecto del **Electivo I: Taller de UI y UX (UCM)**. Diseño de Luis Barrios Urbina y Alan Troncoso Jara.
 > Las capturas usan el modo demo, con portadas de muestra generadas localmente.
+
+## Descargar
+
+**[Descargar LPhoton 0.9.0 para Windows](https://github.com/GuerreroSD/lphoton/releases/download/v0.9.0/LPhoton_0.9.0_x64-setup.exe)** · instalador de 2 MB para Windows 10 u 11 de 64 bits.
+
+1. Abre el archivo descargado. El instalador no está firmado, así que Windows puede mostrar el aviso "Windows protegió su PC": elige **Más información** y luego **Ejecutar de todas formas**.
+2. Sigue el instalador. Se instala solo para tu usuario y no pide permisos de administrador.
+3. Abre LPhoton desde el menú Inicio y vincula las plataformas que tengas instaladas (Steam, Epic Games o GOG Galaxy).
+
+Las demás versiones están en [Releases](https://github.com/GuerreroSD/lphoton/releases).
 
 ---
 
@@ -20,7 +30,8 @@ Si tienes poco tiempo para jugar, no quieres perderlo cerrando publicidad, esper
 
 | | |
 |---|---|
-| **Biblioteca unificada** | Junta Steam, Epic Games y GOG. Si un juego está en dos tiendas, aparece una sola vez con ambos íconos. Tiene filtros por plataforma, instalados y recientes, y una búsqueda rápida (Ctrl+K). Los juegos sin instalar se distinguen de un vistazo. |
+| **Biblioteca unificada** | Junta Steam, Epic Games y GOG. Si un juego está en dos tiendas, aparece una sola vez con ambos íconos. Tiene filtros por plataforma, instalados y recientes, y una búsqueda rápida (Ctrl+K). Al pasar el cursor, cada portada muestra el tiempo jugado, sus tiendas y un botón **JUGAR** que lanza el juego desde ahí. Los juegos sin instalar se distinguen de un vistazo. |
+| **Ambiente** | El arte del juego activo tiñe el fondo de toda la app, detrás de paneles de vidrio oscuro. La portada activa lleva un borde de neón con los colores del logo. |
 | **Inicio silencioso** | Abre el cliente de la tienda en segundo plano, sin ventanas, y lanza el juego. La pantalla de carga avanza con eventos reales: cliente iniciado → licencia validada → juego detectado → modo ligero. |
 | **Modo ligero** | Mientras juegas, baja la prioridad y libera la RAM de los procesos auxiliares (`steamwebhelper.exe` y similares). Al cerrar el juego, todo vuelve a la normalidad. Nunca toca el proceso principal del cliente, para no romper el DRM ni el guardado en la nube. |
 | **Instalar juegos** | Para los juegos que tienes pero no están instalados, el botón **INSTALAR** abre la descarga en su tienda. En Steam, la ficha muestra el progreso real de la descarga. |
@@ -33,17 +44,36 @@ Si tienes poco tiempo para jugar, no quieres perderlo cerrando publicidad, esper
 
 | Ficha del juego | ¿Optimizar RAM? |
 |---|---|
-| ![Ficha](docs/capturas/ficha.png) | ![Diálogo](docs/capturas/dialogo.png) |
+| ![Ficha](docs/capturas-0.9/ficha.png) | ![Diálogo](docs/capturas-0.9/dialogo.png) |
 | **Iniciando el juego** | **Instalar con progreso** |
-| ![Pantalla de carga](docs/capturas/carga.png) | ![Instalar](docs/capturas/instalar.png) |
+| ![Pantalla de carga](docs/capturas-0.9/carga.png) | ![Instalar](docs/capturas-0.9/instalar.png) |
 | **Foros** | **Configuraciones** |
-| ![Foros](docs/capturas/foros.png) | ![Configuraciones](docs/capturas/configuraciones.png) |
+| ![Foros](docs/capturas-0.9/foros.png) | ![Configuraciones](docs/capturas-0.9/configuraciones.png) |
 | **Perfil** | **Modo claro** |
-| ![Perfil](docs/capturas/perfil.png) | ![Modo claro](docs/capturas/biblioteca-claro.png) |
+| ![Perfil](docs/capturas-0.9/perfil.png) | ![Modo claro](docs/capturas-0.9/biblioteca-claro.png) |
+
+<details>
+<summary><b>Diseño anterior (hasta la versión 0.8.0)</b></summary>
+
+Así se veía LPhoton antes del rediseño de la versión 0.9.0, siguiendo las maquetas originales.
+
+| Biblioteca | Ficha del juego |
+|---|---|
+| ![Biblioteca, diseño anterior](docs/capturas/biblioteca.png) | ![Ficha, diseño anterior](docs/capturas/ficha.png) |
+| **¿Optimizar RAM?** | **Iniciando el juego** |
+| ![Diálogo, diseño anterior](docs/capturas/dialogo.png) | ![Pantalla de carga, diseño anterior](docs/capturas/carga.png) |
+| **Instalar con progreso** | **Foros** |
+| ![Instalar, diseño anterior](docs/capturas/instalar.png) | ![Foros, diseño anterior](docs/capturas/foros.png) |
+| **Configuraciones** | **Perfil** |
+| ![Configuraciones, diseño anterior](docs/capturas/configuraciones.png) | ![Perfil, diseño anterior](docs/capturas/perfil.png) |
+| **Modo claro** | **Login** |
+| ![Modo claro, diseño anterior](docs/capturas/biblioteca-claro.png) | ![Login, diseño anterior](docs/capturas/login.png) |
+
+</details>
 
 ## Rendimiento
 
-Mediciones reales con la app instalada (detalle en [`docs/rendimiento.md`](docs/rendimiento.md)):
+Mediciones reales con la app instalada (detalle en [`docs/rendimiento.md`](docs/rendimiento.md)). Se tomaron con la versión 0.8.0, antes del rediseño; aún no se repiten con la 0.9.0.
 
 | Requisito | Meta | Medido |
 |---|---|---|
@@ -53,9 +83,7 @@ Mediciones reales con la app instalada (detalle en [`docs/rendimiento.md`](docs/
 
 ## Instalación
 
-1. Descarga o compila el instalador `LPhoton_<versión>_x64-setup.exe` (ver [Compilar el instalador](#compilar-el-instalador)).
-2. Ejecútalo. Se instala solo para tu usuario y no pide permisos de administrador.
-3. Abre LPhoton desde el menú Inicio y vincula las plataformas que tengas instaladas.
+Sigue los pasos de [Descargar](#descargar). Si prefieres compilarlo tú, mira [Compilar el instalador](#compilar-el-instalador).
 
 **Requisitos:** Windows 10 u 11 (x64) con WebView2, que ya viene incluido en Windows 11. Para que una plataforma aparezca, su cliente (Steam, Epic Games Launcher o GOG Galaxy) debe estar instalado en el equipo.
 
@@ -141,7 +169,7 @@ src-tauri/src/            Backend (Rust)
 - [`LPHOTON.md`](LPHOTON.md): especificación completa (requisitos, sistema de diseño, pantallas, backend y plan por fases)
 - [`CHANGELOG.md`](CHANGELOG.md): cambios de cada versión
 - [`docs/rendimiento.md`](docs/rendimiento.md): mediciones de RNF6 y RNF7
-- [`docs/maquetas/`](docs/maquetas): maquetas originales
+- [`docs/maquetas/`](docs/maquetas): maquetas originales (el diseño hasta la versión 0.8.0)
 - [`docs/guia-de-estilos.pdf`](docs/guia-de-estilos.pdf): guía de estilos
 
 ## Privacidad
