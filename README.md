@@ -15,7 +15,7 @@
 2. Sigue el instalador. Se instala solo para tu usuario y no pide permisos de administrador.
 3. Abre LPhoton, **inicia sesión con Steam** (o continúa con un perfil local) y vincula las plataformas que tengas instaladas (Steam, Epic Games o GOG Galaxy).
 
-Desde la versión 0.10.0, LPhoton **se actualiza solo**: cuando hay una versión nueva aparece un aviso para instalarla con un clic. Si tienes la 0.9.0 o anterior, instala la 0.10.0 a mano una vez.
+> El instalador publicado es el de la **versión 0.9.0**. La 0.10.0 (iniciar sesión con Steam y actualizaciones automáticas) está en este repositorio como código fuente, pero aún no tiene instalador: Windows Defender marcó el instalador sin firma como sospechoso. Puedes compilarla tú (ver [Compilar el instalador](#compilar-el-instalador)).
 
 ---
 
