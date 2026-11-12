@@ -2,6 +2,7 @@ import { useLayoutEffect } from "react";
 import { BrowserRouter, Navigate, Outlet, Route, Routes, useLocation } from "react-router-dom";
 import { Ambient } from "./components/Ambient";
 import { NavBar } from "./components/NavBar";
+import { UpdateNotice } from "./components/UpdateNotice";
 import { useAppStore } from "./store/appStore";
 import { DevComponents } from "./screens/DevComponents";
 import { Forums } from "./screens/Forums";
@@ -13,10 +14,11 @@ import { Profile } from "./screens/Profile";
 import { Settings } from "./screens/Settings";
 import styles from "./App.module.css";
 
-/** El Login se muestra solo mientras no haya ninguna plataforma vinculada (§6.1). */
+/** El inicio se muestra mientras no haya sesión (Steam o perfil local) o plataformas vinculadas (§6.1). */
 function RequireLinked() {
   const linked = useAppStore((s) => s.linkedPlatforms);
-  return linked.length > 0 ? <Outlet /> : <Navigate to="/login" replace />;
+  const username = useAppStore((s) => s.username);
+  return linked.length > 0 && username ? <Outlet /> : <Navigate to="/login" replace />;
 }
 
 function MainLayout() {
@@ -33,6 +35,7 @@ function MainLayout() {
           <Outlet />
         </div>
       </main>
+      <UpdateNotice />
     </div>
   );
 }

@@ -12,6 +12,7 @@ mod metrics;
 mod models;
 mod platform;
 mod processes;
+mod steam_login;
 mod system;
 mod tray;
 
@@ -83,6 +84,8 @@ pub fn run() {
         // muestra esa ventana en vez de abrir una segunda copia.
         .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| tray::show_main_window(app)))
         .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_updater::Builder::new().build())
+        .plugin(tauri_plugin_process::init())
         .register_asynchronous_uri_scheme_protocol("cover", covers::handle)
         .setup(move |app| {
             let paths = app.path();
@@ -128,6 +131,8 @@ pub fn run() {
             commands::sync_library,
             commands::get_game_details,
             commands::steam_status,
+            commands::steam_login,
+            commands::steam_login_cancel,
             commands::platforms_status,
             commands::set_steam_api_key,
             commands::clear_steam_api_key,

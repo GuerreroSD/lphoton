@@ -293,3 +293,36 @@ pub fn report_startup(state: State<'_, AppState>, games: usize) -> Option<u128> 
     crate::log_line(&state, &format!("startup_ms={ms} games={games}"));
     Some(ms)
 }
+
+// ── Iniciar sesión con Steam ────────────────────────────────────────────
+
+/// Abre la página oficial de Steam en el navegador y espera a que el usuario
+/// inicie sesión. Devuelve la cuenta verificada (SteamID, nombre y avatar).
+#[tauri::command]
+pub async fn steam_login(app: tauri::AppHandle, state: State<'_, AppState>) -> Result<crate::steam_login::SteamAccount, String> {
+    use tauri_plugin_opener::OpenerExt;
+    let pending = crate::steam_login::prepare()?;
+    app.opener()
+        .open_url(pending.login_url.clone(), None::<&str>)
+        .map_err(|e| format!("No se pudo abrir el navegador: {e}"))?;
+    let return_to = pending.return_to.clone();
+    let (mut stream, params) = blocking(move || crate::steam_login::wait_for_callback(&pending)).await??;
+
+    let state = state.inner().clone();
+    let verified = crate::steam_login::verify(&state.http, &params, &return_to).await;
+    let page = match &verified {
+        Ok(_) => crate::steam_login::page(true, ""),
+        Err(e) => crate::steam_login::page(false, e),
+    };
+    blocking(move || crate::steam_login::respond(&mut stream, 200, &page)).await?;
+    let steam_id = verified?;
+    crate::log_line(&state, "steam_login ok");
+    // Volver a LPhoton: la ventana pasa al frente.
+    crate::tray::show_main_window(&app);
+    Ok(crate::steam_login::profile(&state.http, steam_id).await)
+}
+
+#[tauri::command]
+pub fn steam_login_cancel() {
+    crate::steam_login::cancel();
+}

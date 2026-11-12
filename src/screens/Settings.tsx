@@ -18,6 +18,7 @@ import {
   type InstallPath,
 } from "../lib/system";
 import { errorMessage, inTauri } from "../lib/tauri";
+import { checkForUpdate, type AvailableUpdate } from "../lib/updates";
 import { useAppStore } from "../store/appStore";
 import { PLATFORM_NAMES, type LightModePreference, type Platform, type Theme } from "../types";
 import { SectionPage } from "./Page";
@@ -332,16 +333,66 @@ function InstallPathsSection() {
 
 function AboutSection() {
   const [version, setVersion] = useState<string | null>(null);
+  const [checking, setChecking] = useState(false);
+  const [update, setUpdate] = useState<AvailableUpdate | null>(null);
+  const [message, setMessage] = useState<{ tone: "success" | "error" | "info"; text: string } | null>(null);
+  const [installing, setInstalling] = useState(false);
   useEffect(() => {
     getAppVersion()
       .then(setVersion)
       .catch(() => setVersion(null));
   }, []);
+
+  const onCheck = async () => {
+    setChecking(true);
+    setMessage(null);
+    try {
+      const found = await checkForUpdate();
+      setUpdate(found);
+      setMessage(
+        found
+          ? { tone: "info", text: `Hay una versión nueva: LPhoton ${found.version}.` }
+          : { tone: "success", text: "Tienes la última versión." },
+      );
+    } catch (err) {
+      setMessage({ tone: "error", text: errorMessage(err, "No pudimos buscar actualizaciones. Revisa tu conexión.") });
+    } finally {
+      setChecking(false);
+    }
+  };
+
+  const onInstall = async () => {
+    if (!update) return;
+    setInstalling(true);
+    setMessage({ tone: "info", text: "Descargando la actualización… LPhoton se reiniciará solo." });
+    try {
+      await update.install(() => undefined);
+    } catch (err) {
+      setInstalling(false);
+      setMessage({ tone: "error", text: errorMessage(err, "No se pudo instalar la actualización.") });
+    }
+  };
+
   return (
     <Section id="settings-about" title="Acerca de">
       <p className={styles.help}>
-        LPhoton {version ? `v${version}` : ""} · Sin anuncios, sin tienda y sin ventanas emergentes.
+        LPhoton {version ? `v${version}` : ""} · Sin anuncios, sin tienda y sin ventanas emergentes. Código abierto
+        con licencia MIT.
       </p>
+      {inTauri && (
+        <div>
+          {update ? (
+            <TextButton onClick={() => void onInstall()} disabled={installing}>
+              Actualizar a {update.version}
+            </TextButton>
+          ) : (
+            <TextButton onClick={() => void onCheck()} disabled={checking}>
+              {checking ? "Buscando…" : "Buscar actualizaciones"}
+            </TextButton>
+          )}
+        </div>
+      )}
+      {message && <Toast tone={message.tone}>{message.text}</Toast>}
     </Section>
   );
 }

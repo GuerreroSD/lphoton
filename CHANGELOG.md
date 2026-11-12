@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.10.0] – 2026-11-12 · Publicación gratuita: login con Steam y actualizaciones
+
+### Iniciar sesión con Steam
+- El login falso (aceptaba cualquier usuario y contraseña) se reemplaza por **Iniciar sesión con Steam** (OpenID 2.0, sin servidor propio). LPhoton abre la página oficial de Steam en el navegador, recibe la respuesta en un puerto local (127.0.0.1, puerto al azar) y la verifica con Steam (`check_authentication`) antes de aceptar la cuenta. Luego lee el nombre y el avatar públicos.
+- La contraseña se escribe en steamcommunity.com, nunca en LPhoton. Cada intento lleva un valor aleatorio propio; se puede cancelar y caduca a los 5 minutos.
+- Quien no usa Steam puede **continuar con un perfil local** (solo un nombre).
+- Perfil: avatar y nombre de Steam, con **Cerrar sesión**. El inicio de sesión ahora es obligatorio para entrar a la biblioteca, además de vincular una plataforma.
+
+### Actualizaciones automáticas
+- LPhoton busca una versión nueva en GitHub 6 s después de abrir (no afecta el arranque) y muestra un aviso para **actualizar con un clic**. También en **Configuraciones → Acerca de → Buscar actualizaciones**.
+- Los instaladores van firmados con la clave del proyecto y se verifican antes de instalarse (`tauri-plugin-updater`). Nuevo `scripts/updater-manifest.mjs` para generar `latest.json`.
+
+### Publicación
+- Licencia **MIT** (`LICENSE`).
+- README: descarga desde el último release, cómo publicar una versión, privacidad del login y por qué las horas sin API key pueden no coincidir con Steam.
+
 ## [0.9.0] – 2026-11-12 · Rediseño inmersivo
 
 La interfaz deja las maquetas originales y pasa a un launcher visual, al estilo de GOG Galaxy y Steam Big Picture. Sigue usando solo tokens, y las transiciones solo `transform`, `opacity` y `box-shadow`.

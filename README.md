@@ -9,13 +9,13 @@
 
 ## Descargar
 
-**[Descargar LPhoton 0.9.0 para Windows](https://github.com/GuerreroSD/lphoton/releases/download/v0.9.0/LPhoton_0.9.0_x64-setup.exe)** · instalador de 2 MB para Windows 10 u 11 de 64 bits.
+**[Descargar LPhoton para Windows](https://github.com/GuerreroSD/lphoton/releases/latest)** · gratis y de código abierto. En la página del release, descarga `LPhoton_<versión>_x64-setup.exe` (unos 2 MB) en *Assets*. Funciona en Windows 10 u 11 de 64 bits.
 
 1. Abre el archivo descargado. El instalador no está firmado, así que Windows puede mostrar el aviso "Windows protegió su PC": elige **Más información** y luego **Ejecutar de todas formas**.
 2. Sigue el instalador. Se instala solo para tu usuario y no pide permisos de administrador.
-3. Abre LPhoton desde el menú Inicio y vincula las plataformas que tengas instaladas (Steam, Epic Games o GOG Galaxy).
+3. Abre LPhoton, **inicia sesión con Steam** (o continúa con un perfil local) y vincula las plataformas que tengas instaladas (Steam, Epic Games o GOG Galaxy).
 
-Las demás versiones están en [Releases](https://github.com/GuerreroSD/lphoton/releases).
+Desde la versión 0.10.0, LPhoton **se actualiza solo**: cuando hay una versión nueva aparece un aviso para instalarla con un clic. Si tienes la 0.9.0 o anterior, instala la 0.10.0 a mano una vez.
 
 ---
 
@@ -39,6 +39,8 @@ Si tienes poco tiempo para jugar, no quieres perderlo cerrando publicidad, esper
 | **Bandeja del sistema** | Al jugar, LPhoton pasa a la bandeja y cierra su ventana para liberar memoria. Se vuelve a abrir con un clic en el ícono. |
 | **Configuraciones** | Modo ligero (preguntar, siempre o nunca) y la lista de procesos que se aligeran, tema claro u oscuro, iniciar con Windows (desactivado por defecto) y rutas de instalación. |
 | **Perfil** | Total de juegos y horas jugadas sumadas de todas las tiendas, desglose por plataforma y tus juegos más jugados. |
+| **Iniciar sesión con Steam** | Inicias sesión en la página oficial de Steam, en tu navegador; LPhoton recibe solo tu cuenta verificada, tu nombre y tu avatar públicos. Sin Steam, puedes entrar con un perfil local. |
+| **Actualizaciones** | LPhoton busca versiones nuevas en GitHub al iniciar y las instala con un clic. Cada instalador viene firmado y se verifica antes de instalarse. |
 
 ## Capturas
 
@@ -96,6 +98,8 @@ Sin configurar nada, LPhoton muestra los juegos de Steam **instalados** (los lee
 
 La key se guarda en el **Administrador de credenciales de Windows**, nunca en texto plano.
 
+> **¿Por qué mis horas no coinciden con Steam?** Sin API key, LPhoton lee las horas que el cliente de Steam guardó **en este PC** (`localconfig.vdf`). Ese archivo no siempre tiene el total de la cuenta: puede faltar el tiempo jugado en otros equipos, en Steam Deck o antes de reinstalar Steam. Con la API key, las horas salen de la cuenta y coinciden con Steam.
+
 > **Epic Games** no tiene una API pública, así que solo se muestran los juegos instalados. **GOG** lee la base de datos de GOG Galaxy, que incluye también los no instalados.
 
 ## Desarrollo
@@ -129,6 +133,22 @@ npm run tauri build
 ```
 
 El instalador NSIS queda en `src-tauri/target/release/bundle/nsis/LPhoton_<versión>_x64-setup.exe`.
+
+### Publicar una versión
+
+Las actualizaciones automáticas necesitan que el instalador vaya firmado con la clave del proyecto (no es la firma de código de Windows; es la del actualizador de Tauri).
+
+1. Sube la versión en `package.json`, `src-tauri/tauri.conf.json` y `src-tauri/Cargo.toml`, y agrega la entrada en `CHANGELOG.md`.
+2. Compila con la clave privada (nunca se sube al repositorio):
+
+   ```bash
+   TAURI_SIGNING_PRIVATE_KEY="$USERPROFILE/.tauri/lphoton-updater.key" TAURI_SIGNING_PRIVATE_KEY_PASSWORD="" npm run tauri build
+   node scripts/updater-manifest.mjs   # crea latest.json junto al instalador
+   ```
+
+3. Crea el release `v<versión>` en GitHub con `LPhoton_<versión>_x64-setup.exe`, su `.sig` y `latest.json`. Las copias instaladas leen `releases/latest/download/latest.json`.
+
+> Si se pierde la clave privada, las copias ya instaladas no podrán actualizarse solas: habrá que generar otra y reinstalar a mano. Guarda un respaldo de `lphoton-updater.key` fuera del equipo.
 
 ### Stack
 
@@ -174,4 +194,11 @@ src-tauri/src/            Backend (Rust)
 
 ## Privacidad
 
-LPhoton no tiene cuentas propias, servidores ni telemetría. La biblioteca, las portadas, tus soluciones y la configuración se guardan solo en tu equipo. Las únicas conexiones salen a las APIs públicas de Steam y GOG, para la biblioteca, las descripciones y las portadas.
+LPhoton no tiene cuentas propias, servidores ni telemetría. La biblioteca, las portadas, tus soluciones y la configuración se guardan solo en tu equipo.
+
+- **Iniciar sesión con Steam** usa OpenID, el sistema oficial de Steam: escribes tu contraseña en steamcommunity.com, nunca en LPhoton. LPhoton solo recibe tu SteamID y lee tu nombre y avatar públicos. No guarda tokens ni contraseñas.
+- Las demás conexiones van a las APIs públicas de Steam y GOG (biblioteca, descripciones y portadas) y a GitHub, para buscar actualizaciones.
+
+## Licencia
+
+[MIT](LICENSE) © 2026 Luis Barrios Urbina y Alan Troncoso Jara. Puedes usar, modificar y redistribuir LPhoton libremente, manteniendo el aviso de autoría. Steam, Epic Games y GOG son marcas de sus dueños; LPhoton no está afiliado a ellos.

@@ -1,8 +1,10 @@
 [package]
 name = "lphoton"
-version = "0.9.0"
+version = "0.10.0"
 description = "LPhoton: launcher liviano que unifica Steam, Epic Games y GOG"
 authors = ["Luis Barrios Urbina", "Alan Troncoso Jara"]
+license = "MIT"
+repository = "https://github.com/GuerreroSD/lphoton"
 edition = "2021"
 rust-version = "1.82"
 
@@ -29,6 +31,12 @@ keyring = { version = "3", features = ["windows-native"] }
 reqwest = { version = "0.12", default-features = false, features = ["json", "native-tls"] }
 # Procesos, CPU y RAM (modo ligero, detección del juego, métricas)
 sysinfo = { version = "0.37", default-features = false, features = ["system"] }
+# Iniciar sesión con Steam (OpenID): URL de Steam, respuesta y avatar como data URL
+url = "2"
+base64 = "0.22"
+# Actualizaciones automáticas desde los releases de GitHub
+tauri-plugin-updater = "2"
+tauri-plugin-process = "2"
 
 [target.'cfg(windows)'.dependencies]
 winreg = "0.55"

@@ -21,6 +21,19 @@
   font-weight: var(--weight-title);
   font-size: var(--fs-title);
   line-height: 1;
+  object-fit: cover;
+}
+
+.nameBlock {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.accountKind {
+  color: var(--text-muted);
+  font-weight: var(--weight-label);
+  font-size: var(--fs-label);
 }
 
 .name {

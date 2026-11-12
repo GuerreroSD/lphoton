@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { TextButton } from "../components/Button";
 import { PlatformBadge, PlatformBadges } from "../components/PlatformBadge";
 import { totalPlaytimeMinutes } from "../lib/library";
@@ -126,10 +126,37 @@ export function Profile() {
 }
 
 function UsernameField() {
+  const navigate = useNavigate();
   const username = useAppStore((s) => s.username);
+  const steamAccount = useAppStore((s) => s.steamAccount);
   const setUsername = useAppStore((s) => s.setUsername);
+  const signOut = useAppStore((s) => s.signOut);
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(username ?? "");
+
+  const onSignOut = () => {
+    signOut();
+    navigate("/login");
+  };
+
+  if (steamAccount) {
+    return (
+      <div className={styles.nameRow}>
+        {steamAccount.avatar ? (
+          <img className={styles.avatar} src={steamAccount.avatar} alt="" width={52} height={52} />
+        ) : (
+          <span className={styles.avatar} aria-hidden="true">
+            {steamAccount.name.trim().charAt(0).toUpperCase() || "?"}
+          </span>
+        )}
+        <span className={styles.nameBlock}>
+          <span className={styles.name}>{steamAccount.name}</span>
+          <span className={styles.accountKind}>Cuenta de Steam</span>
+        </span>
+        <TextButton onClick={onSignOut}>Cerrar sesión</TextButton>
+      </div>
+    );
+  }
 
   const onSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -153,6 +180,7 @@ function UsernameField() {
         >
           Cambiar nombre
         </TextButton>
+        <TextButton onClick={onSignOut}>Iniciar sesión con Steam</TextButton>
       </div>
     );
   }

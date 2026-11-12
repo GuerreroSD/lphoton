@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { createJSONStorage, persist, type StateStorage } from "zustand/middleware";
-import { isPlatformAvailable } from "../lib/accounts";
+import { isPlatformAvailable, type SteamAccount } from "../lib/accounts";
 import { getCachedLibrary, syncLibrary } from "../lib/library";
 import { errorMessage } from "../lib/tauri";
 import type { Game, LightModePreference, Platform, Theme } from "../types";
@@ -43,6 +43,8 @@ const safeStorage: StateStorage = {
 interface AppState {
   // Persistido
   username: string | null;
+  /** Cuenta de Steam con la que se inició sesión (null: perfil local). */
+  steamAccount: SteamAccount | null;
   linkedPlatforms: Platform[];
   lightModePref: LightModePreference;
   theme: Theme;
@@ -62,6 +64,9 @@ interface AppState {
   activeGameId: string | null;
 
   setUsername: (username: string | null) => void;
+  signInWithSteam: (account: SteamAccount) => void;
+  /** Cierra la sesión: vuelve a la pantalla de inicio (las plataformas siguen vinculadas). */
+  signOut: () => void;
   setPlatformLinked: (platform: Platform, linked: boolean) => void;
   setLightModePref: (pref: LightModePreference) => void;
   setTheme: (theme: Theme) => void;
@@ -81,6 +86,7 @@ export const useAppStore = create<AppState>()(
   persist(
     (set, get) => ({
       username: null,
+      steamAccount: null,
       linkedPlatforms: [],
       lightModePref: "ask",
       theme: "dark",
@@ -96,6 +102,8 @@ export const useAppStore = create<AppState>()(
       activeGameId: null,
 
       setUsername: (username) => set({ username }),
+      signInWithSteam: (account) => set({ steamAccount: account, username: account.name }),
+      signOut: () => set({ steamAccount: null, username: null }),
       setPlatformLinked: (platform, linked) =>
         set((s) => ({
           linkedPlatforms: linked
@@ -170,6 +178,7 @@ export const useAppStore = create<AppState>()(
       },
       partialize: (s) => ({
         username: s.username,
+        steamAccount: s.steamAccount,
         linkedPlatforms: s.linkedPlatforms,
         lightModePref: s.lightModePref,
         theme: s.theme,

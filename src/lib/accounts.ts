@@ -8,8 +8,12 @@ import { inTauri, invoke } from "./tauri";
 
 const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-export interface Session {
-  username: string;
+/** Cuenta verificada por Steam (OpenID). */
+export interface SteamAccount {
+  steamId: string;
+  name: string;
+  /** Avatar como data URL, o null si el perfil no tiene. */
+  avatar: string | null;
 }
 
 /** Plataformas integradas (las tres desde la fase 3). */
@@ -31,12 +35,20 @@ const NOT_FOUND_MESSAGES: Record<Platform, string> = {
   gog: "No encontramos GOG Galaxy ni juegos de GOG instalados en este equipo.",
 };
 
-export async function login(username: string, password: string): Promise<Session> {
-  await delay(250);
-  if (!username.trim() || !password) {
-    throw new Error("Ingresa tu usuario y contraseña.");
+/**
+ * Iniciar sesión con Steam: abre la página oficial de Steam en el navegador y
+ * espera a que el usuario confirme. La contraseña nunca pasa por LPhoton.
+ */
+export async function steamLogin(): Promise<SteamAccount> {
+  if (!inTauri) {
+    await delay(900);
+    return { steamId: "76561198000000000", name: "Jugador demo", avatar: null };
   }
-  return { username: username.trim() };
+  return invoke<SteamAccount>("steam_login");
+}
+
+export async function cancelSteamLogin(): Promise<void> {
+  if (inTauri) await invoke("steam_login_cancel");
 }
 
 export async function getSteamStatus(): Promise<SteamStatus> {
