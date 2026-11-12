@@ -14,6 +14,10 @@ Solo código fuente: el instalador sin firma fue marcado por Windows Defender y 
 - LPhoton busca una versión nueva en GitHub 6 s después de abrir (no afecta el arranque) y muestra un aviso para **actualizar con un clic**. También en **Configuraciones → Acerca de → Buscar actualizaciones**.
 - Los instaladores van firmados con la clave del proyecto y se verifican antes de instalarse (`tauri-plugin-updater`). Nuevo `scripts/updater-manifest.mjs` para generar `latest.json`.
 
+### Horas jugadas de Steam
+- Con API key, las horas de cada juego son el **mayor** valor entre la Web API y lo que el cliente de Steam guardó en el PC (`localconfig.vdf`). A cada fuente le pueden faltar sesiones (sin conexión, otro equipo), pero ninguna cuenta de más. Antes, con API key, se ignoraba siempre el valor local.
+- Diagnóstico: al sincronizar, `lphoton.log` anota (`playtime_check`) los juegos cuyas horas no coinciden entre ambas fuentes o que tienen tiempo jugado sin conexión según la API.
+
 ### Publicación
 - Licencia **MIT** (`LICENSE`).
 - README: descarga desde el último release, cómo publicar una versión, privacidad del login y por qué las horas sin API key pueden no coincidir con Steam.

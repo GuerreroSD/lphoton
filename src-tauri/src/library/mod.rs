@@ -80,7 +80,13 @@ pub async fn sync(state: &AppState) -> SyncResult {
     let mut owned = None;
     if let (Some(key), Some(id)) = (credentials::steam_api_key(), steam_id) {
         match steam::owned_games(&state.http, &key, id).await {
-            Ok(games) => owned = Some(games),
+            Ok(games) => {
+                // Diagnóstico de horas: queda en lphoton.log, solo con lo que no cuadra.
+                for line in steam::playtime_mismatches(&games, &playtime) {
+                    crate::log_line(state, &line);
+                }
+                owned = Some(games);
+            }
             Err(e) => warning = Some(format!("Error al sincronizar con Steam. {e}")),
         }
     }

@@ -51,6 +51,9 @@ pub struct OwnedGame {
     pub name: String,
     #[serde(default)]
     pub playtime_forever: u64,
+    /// Minutos jugados con el cliente de Steam sin conexión (la API los informa aparte).
+    #[serde(default)]
+    pub playtime_disconnected: u64,
     #[serde(default)]
     pub rtime_last_played: u64,
 }
@@ -431,11 +434,14 @@ pub fn build_games(
 
     if let Some(owned) = owned {
         for g in owned {
+            // Ni la Web API ni localconfig cuentan de más, pero a cada una le pueden
+            // faltar sesiones (sin conexión, otro PC): el mayor queda más cerca del total.
+            let local = playtime.get(&g.appid).map(|p| p.minutes).unwrap_or(0);
             by_id.insert(
                 g.appid,
                 (
                     g.name.clone(),
-                    source(g.appid, false, g.playtime_forever, g.rtime_last_played),
+                    source(g.appid, false, g.playtime_forever.max(local), g.rtime_last_played),
                 ),
             );
         }
@@ -447,10 +453,8 @@ pub fn build_games(
             .entry(app.appid)
             .or_insert_with(|| (app.name.clone(), source(app.appid, false, 0, 0)));
         entry.1.installed = app.installed;
-        // La Web API es la referencia de horas; localconfig sirve sin conexión.
-        if entry.1.playtime_minutes == 0 {
-            entry.1.playtime_minutes = local.minutes;
-        }
+        // Sin Web API, localconfig es la única fuente; con ella, se toma el mayor.
+        entry.1.playtime_minutes = entry.1.playtime_minutes.max(local.minutes);
         let last = app.last_played.max(local.last_played);
         if entry.1.last_played.is_none() && last > 0 {
             entry.1.last_played = Some(unix_to_iso(last));
@@ -463,6 +467,23 @@ pub fn build_games(
             id: format!("steam-{}", src.external_id),
             title,
             sources: vec![src],
+        })
+        .collect()
+}
+
+/// Juegos cuyas horas difieren entre la Web API y localconfig, para el log de diagnóstico.
+pub fn playtime_mismatches(owned: &[OwnedGame], playtime: &HashMap<u32, LocalPlaytime>) -> Vec<String> {
+    owned
+        .iter()
+        .filter_map(|g| {
+            let local = playtime.get(&g.appid).map(|p| p.minutes).unwrap_or(0);
+            let differs = local.abs_diff(g.playtime_forever) >= 60 || g.playtime_disconnected > 0;
+            differs.then(|| {
+                format!(
+                    "playtime_check appid={} name=\"{}\" api_forever={} api_disconnected={} local={}",
+                    g.appid, g.name, g.playtime_forever, g.playtime_disconnected, local
+                )
+            })
         })
         .collect()
 }
@@ -526,11 +547,27 @@ mod tests {
     }
 
     #[test]
+    fn horas_toma_el_mayor_entre_api_y_local() {
+        let owned = vec![
+            OwnedGame { appid: 1, name: "API mayor".into(), playtime_forever: 600, playtime_disconnected: 0, rtime_last_played: 0 },
+            OwnedGame { appid: 2, name: "Local mayor".into(), playtime_forever: 100, playtime_disconnected: 0, rtime_last_played: 0 },
+        ];
+        let mut local = HashMap::new();
+        local.insert(1, LocalPlaytime { minutes: 300, last_played: 0 });
+        local.insert(2, LocalPlaytime { minutes: 900, last_played: 0 });
+        let games = build_games(&[], &local, Some(&owned));
+        let minutes = |id: &str| games.iter().find(|g| g.id == id).unwrap().sources[0].playtime_minutes;
+        assert_eq!(minutes("steam-1"), 600);
+        assert_eq!(minutes("steam-2"), 900);
+        assert_eq!(playtime_mismatches(&owned, &local).len(), 2);
+    }
+
+    #[test]
     fn merges_owned_and_installed() {
         let installed = vec![LocalApp { appid: 10, name: "Local".into(), installed: true, last_played: 100 }];
         let owned = vec![
-            OwnedGame { appid: 10, name: "Remoto".into(), playtime_forever: 50, rtime_last_played: 0 },
-            OwnedGame { appid: 20, name: "No instalado".into(), playtime_forever: 0, rtime_last_played: 0 },
+            OwnedGame { appid: 10, name: "Remoto".into(), playtime_forever: 50, playtime_disconnected: 0, rtime_last_played: 0 },
+            OwnedGame { appid: 20, name: "No instalado".into(), playtime_forever: 0, playtime_disconnected: 0, rtime_last_played: 0 },
         ];
         let mut games = build_games(&installed, &HashMap::new(), Some(&owned));
         games.sort_by(|a, b| a.id.cmp(&b.id));
