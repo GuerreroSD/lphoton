@@ -1,5 +1,35 @@
 # Changelog
 
+## [Sin publicar] · Rediseño inmersivo
+
+La interfaz deja las maquetas originales y pasa a un launcher visual, al estilo de GOG Galaxy y Steam Big Picture. Sigue usando solo tokens, y las transiciones solo `transform`, `opacity` y `box-shadow`.
+
+### Ambiente
+- **Fondo negro azulado** (`#06070D`) en lugar del morado. Detrás de todo va el arte del **juego activo**, muy desenfocado, que cambia con un fundido de 800 ms (componente `Ambient`).
+- El juego activo es el último bajo el cursor o con el foco (en la grilla o en la lista), el de la ficha abierta o el elegido en Foros. Al abrir, es el jugado más recientemente.
+- El desenfoque se calcula una vez por imagen y el cambio es solo de opacidad. Pasar el cursor por varias portadas camino a otra no cambia el fondo (espera 110 ms).
+
+### Paneles de vidrio
+- **Barra superior** y **panel lateral** flotan sobre el ambiente como vidrio oscuro translúcido, con filo de 1 px y esquinas de 18 px. La barra baja de 96 a 64 px; las secciones son pestañas con un subrayado de neón en la activa.
+- La ficha, las tarjetas de Configuraciones y Perfil, el panel de Foros y el Login usan el mismo vidrio.
+- El panel lateral muestra una **miniatura** de cada portada; solo se desplaza la lista, los filtros quedan fijos.
+
+### Portadas
+- Bajo el cursor la portada **crece un 6 %** (260 ms) y muestra el nombre, el **tiempo jugado**, los **íconos de sus tiendas** y un botón **JUGAR** celeste (INSTALAR si no está instalada).
+- JUGAR lanza el juego **desde la biblioteca**, con la misma pregunta del modo ligero que la ficha (`useLaunchFlow`). INSTALAR lleva a la ficha, donde se sigue la descarga.
+- La portada del juego activo lleva un **borde de neón celeste→rosado** con su resplandor, los colores del logo.
+- Las portadas sin instalar se ven apagadas y se encienden bajo el cursor.
+
+### Ficha del juego
+- El nombre va en grande sobre el banner; debajo, JUGAR con resplandor, la descripción y los datos en dos columnas (etiqueta y valor). En ventanas de menos de 1100 px los datos pasan a una fila.
+
+### Detalles
+- JUGAR y los botones principales pasan de morado a **celeste con sombra dura rosada**.
+- Los nombres de juegos y títulos usan un blanco frío (`--text-primary`); el celeste queda para lo activo y los enlaces.
+- Barras de desplazamiento finas y sin flechas. El contenido se desenfoca más bajo los diálogos.
+- El modo claro conserva todo el rediseño con vidrio claro.
+- Tokens nuevos: `--palette-void`, `--palette-ink`, `--text-primary`, `--glass-bg`, `--glass-bg-strong`, `--glass-filter`, `--glass-edge`, `--ambient-*`, `--neon-ring`, `--neon-glow`, `--shadow-cover`, `--radius-xl`, `--shell-gap`, `--duration-smooth`, `--duration-ambient`, `--ease-soft`, `--scrollbar-thumb`.
+
 ## [0.8.0] – 2026-11-12 · Mejoras de interfaz
 
 Pulido general sin salir de la guía de estilos: mismos colores, tipografías y componentes. Las transiciones siguen usando solo `transform`, `opacity` y `box-shadow` (≤150 ms).

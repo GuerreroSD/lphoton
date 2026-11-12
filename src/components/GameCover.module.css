@@ -1,36 +1,83 @@
 .cover {
   position: relative;
-  display: block;
+  isolation: isolate;
   width: 100%;
   aspect-ratio: 2 / 3;
-  border-radius: var(--radius-sm);
-  overflow: hidden;
-  background: var(--cover-placeholder);
-  box-shadow: 0 0 0 1px var(--divider);
-  transition:
-    box-shadow var(--duration-base) var(--ease-out),
-    transform var(--duration-base) var(--ease-out);
+  border-radius: var(--radius-md);
+  transition: transform var(--duration-smooth) var(--ease-soft);
 }
 
-.cover img {
+/* ── Neón de la carátula activa: borde celeste→rosado y su resplandor ── */
+.cover::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  z-index: -1;
+  border-radius: calc(var(--radius-md) + 2px);
+  background: var(--neon-ring);
+  box-shadow: var(--neon-glow);
+  opacity: 0;
+  transition: opacity var(--duration-smooth) var(--ease-out);
+}
+
+.cover[data-active]::before,
+.cover:hover::before,
+.cover:focus-within::before {
+  opacity: 1;
+}
+
+.cover[data-active] {
+  z-index: 1;
+}
+
+/* Escala suave bajo el cursor: la portada se adelanta sobre sus vecinas. */
+.cover:hover,
+.cover:focus-within {
+  z-index: 2;
+  transform: scale(1.06);
+}
+
+.cover:has(.art:active) {
+  transform: scale(1.03);
+}
+
+/* ── Arte ──────────────────────────────────────────────────────────── */
+.art {
+  position: absolute;
+  inset: 0;
+  display: block;
+  border-radius: inherit;
+  overflow: hidden;
+  background: var(--cover-placeholder);
+  box-shadow: var(--shadow-cover);
+}
+
+.art:focus-visible {
+  outline: none;
+}
+
+.art img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.cover:hover,
-.cover:focus-visible {
-  outline: none;
-  box-shadow: var(--shadow-cover-focus);
-  transform: translateY(-4px);
+/* Sin instalar: el arte se apaga y vuelve a encenderse bajo el cursor. */
+.notInstalled .art::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgb(var(--palette-void-rgb) / 0.55);
+  transition: opacity var(--duration-smooth) var(--ease-out);
 }
 
-.cover:active {
-  transform: translateY(-1px);
+.notInstalled:hover .art::after,
+.notInstalled:focus-within .art::after,
+.notInstalled[data-active] .art::after {
+  opacity: 0;
 }
 
-/* ── Marca de "no instalado" (esquina superior derecha) ───────────── */
-.notInstalled {
+.badge {
   position: absolute;
   top: var(--space-2);
   right: var(--space-2);
@@ -40,18 +87,19 @@
   width: 28px;
   height: 28px;
   border-radius: var(--radius-pill);
-  background: rgb(var(--palette-neutral-dark-rgb) / 0.88);
-  box-shadow: 0 0 0 1px rgb(var(--palette-accent-rgb) / 0.45);
-  color: var(--palette-accent);
+  background: rgb(var(--palette-void-rgb) / 0.82);
+  box-shadow: inset 0 0 0 1px rgb(var(--palette-ink-rgb) / 0.22);
+  color: var(--palette-ink);
+  pointer-events: none;
 }
 
-.notInstalledIcon {
-  width: 14px;
-  height: 14px;
+.badgeIcon {
+  width: 13px;
+  height: 13px;
 }
 
-/* ── Franja con el nombre y las tiendas (al pasar el mouse o con foco) ── */
-.caption {
+/* ── Capa que aparece bajo el cursor: nombre, tiempo, tiendas y JUGAR ── */
+.overlay {
   position: absolute;
   right: 0;
   bottom: 0;
@@ -59,27 +107,30 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
-  padding: var(--space-6) var(--space-3) var(--space-3);
+  padding: var(--space-8) var(--space-3) var(--space-3);
+  border-radius: 0 0 var(--radius-md) var(--radius-md);
   background: var(--cover-scrim);
   opacity: 0;
-  transform: translateY(6px);
+  transform: translateY(10px);
   transition:
-    opacity var(--duration-base) var(--ease-out),
-    transform var(--duration-base) var(--ease-out);
+    opacity var(--duration-smooth) var(--ease-out),
+    transform var(--duration-smooth) var(--ease-soft);
+  /* Los clics fuera del botón llegan a la portada (abren la ficha). */
   pointer-events: none;
 }
 
-.cover:hover .caption,
-.cover:focus-visible .caption {
+.cover:hover .overlay,
+.cover:focus-within .overlay {
   opacity: 1;
   transform: translateY(0);
 }
 
-/* Neutral claro sobre la franja oscura (9.9:1), en ambos temas. */
-.captionTitle {
-  color: var(--palette-neutral-light);
-  font-weight: var(--weight-label);
-  font-size: var(--fs-label);
+/* Siempre claro: el velo de la portada es oscuro en ambos temas. */
+.title {
+  color: var(--palette-ink);
+  font-family: var(--font-title);
+  font-weight: var(--weight-title);
+  font-size: var(--fs-body-sm);
   line-height: var(--lh-tight);
   display: -webkit-box;
   -webkit-box-orient: vertical;
@@ -88,20 +139,78 @@
   overflow: hidden;
 }
 
-.captionMeta {
+.meta {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-2);
-}
-
-.captionState {
-  color: var(--palette-accent);
+  color: var(--palette-neutral-light);
   font-weight: var(--weight-label);
   font-size: var(--fs-label);
+  font-variant-numeric: tabular-nums;
 }
 
-/* ── Sin portada ───────────────────────────────────────────────────── */
+.playtime {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-width: 0;
+  white-space: nowrap;
+}
+
+.metaIcon {
+  flex: none;
+  width: 13px;
+  height: 13px;
+  color: var(--palette-accent);
+}
+
+/* JUGAR: celeste lleno con sombra dura rosada, lo más luminoso de la portada. */
+.action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  width: 100%;
+  height: clamp(34px, 2.5vw, 40px);
+  margin-top: var(--space-1);
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-md);
+  background: var(--palette-accent);
+  box-shadow: 0 0 18px 0 rgb(var(--palette-accent-rgb) / 0.45);
+  color: var(--palette-void);
+  font-family: var(--font-title);
+  font-weight: var(--weight-title);
+  font-size: var(--fs-label);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  pointer-events: auto;
+  transition:
+    box-shadow var(--duration-base) var(--ease-out),
+    transform var(--duration-fast) var(--ease-out);
+}
+
+.action:hover {
+  box-shadow: 3px 4px 0 0 var(--palette-alert), 0 0 26px 0 rgb(var(--palette-accent-rgb) / 0.6);
+  transform: translate(-1px, -2px);
+}
+
+.action:active {
+  box-shadow: 0 0 12px 0 rgb(var(--palette-accent-rgb) / 0.4);
+  transform: translate(0, 0) scale(0.98);
+}
+
+.action:focus-visible {
+  outline-color: var(--palette-ink);
+}
+
+.actionIcon {
+  width: 12px;
+  height: 12px;
+}
+
+/* ── Sin portada: luces de la marca y el título (oscuro en ambos temas) ── */
 .fallback {
   display: flex;
   flex-direction: column;
@@ -111,19 +220,19 @@
   height: 100%;
   padding: var(--space-4);
   background:
-    radial-gradient(circle at 30% 25%, rgb(var(--color-primary-rgb) / 0.55) 0, transparent 60%),
-    radial-gradient(circle at 80% 80%, rgb(var(--color-accent-rgb) / 0.3) 0, transparent 55%),
-    var(--color-bg-dark);
+    radial-gradient(circle at 22% 18%, rgb(var(--palette-accent-rgb) / 0.42) 0, transparent 58%),
+    radial-gradient(circle at 88% 88%, rgb(var(--palette-alert-rgb) / 0.46) 0, transparent 56%),
+    var(--palette-void);
 }
 
 .fallbackBar {
   width: 32px;
   height: 4px;
-  background: var(--color-alert);
+  background: var(--palette-alert);
 }
 
 .fallbackTitle {
-  color: var(--color-accent);
+  color: var(--palette-ink);
   font-family: var(--font-title);
   font-weight: var(--weight-title);
   font-size: var(--fs-title-sm);
@@ -131,3 +240,4 @@
   text-transform: uppercase;
   overflow-wrap: anywhere;
 }
+

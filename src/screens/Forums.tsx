@@ -5,6 +5,7 @@ import { PlatformBadges } from "../components/PlatformBadge";
 import { Toast } from "../components/Toast";
 import { addFix, deleteFix, fixCounts, listFixes, pcgamingwikiUrl, validateFix, voteFix } from "../lib/community";
 import { errorMessage, openExternal } from "../lib/tauri";
+import { useAppStore } from "../store/appStore";
 import { matchesQuery, useLibrary } from "../store/useLibrary";
 import { FIX_KIND_LABELS, type CommunityFix, type FixKind, type Game } from "../types";
 import styles from "./Forums.module.css";
@@ -25,6 +26,12 @@ export function Forums() {
 
   const selectedId = params.get("juego") ?? alphabetical[0]?.game.id ?? null;
   const selected = alphabetical.find((e) => e.game.id === selectedId) ?? alphabetical[0];
+
+  // El fondo de la app toma el arte del juego elegido.
+  const selectedGameId = selected?.game.id;
+  useEffect(() => {
+    if (selectedGameId) useAppStore.getState().setActiveGame(selectedGameId);
+  }, [selectedGameId]);
   const list = alphabetical.filter((e) => matchesQuery(e.game, filter));
 
   return (

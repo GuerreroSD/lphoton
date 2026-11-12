@@ -1,13 +1,12 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { BackGlyph } from "../assets/icons/icons";
-import { InstallButton, LightModeButton, PlayButton, SkipButton } from "../components/Button";
-import { Dialog } from "../components/Dialog";
+import { InstallButton, PlayButton } from "../components/Button";
+import { useLaunchFlow } from "../components/LaunchFlow";
 import { PlatformBadges } from "../components/PlatformBadge";
 import { ProgressBar } from "../components/ProgressBar";
 import { formatBytes, getInstallStatus, installGame, type InstallStatus } from "../lib/install";
-import { checkClientLoad } from "../lib/lightmode";
-import { getGameDetails } from "../lib/library";
+import { formatPlaytime, getGameDetails } from "../lib/library";
 import { getAppMetrics } from "../lib/metrics";
 import { errorMessage } from "../lib/tauri";
 import { useAppStore } from "../store/appStore";
@@ -160,15 +159,14 @@ function InstallInfo({
   return <p className={styles.installText}>No está instalado. Se instalará con {name}.</p>;
 }
 
-/** Ficha del juego — maqueta 02 (+ diálogo de la maqueta 03). */
+/** Ficha del juego: banner con el título, acción principal y datos sobre un panel de vidrio. */
 export function GameDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { status, entries } = useLibrary();
-  const lightModePref = useAppStore((s) => s.lightModePref);
+  const setActiveGame = useAppStore((s) => s.setActiveGame);
   const metrics = useAppMetrics();
-  const [askPlatform, setAskPlatform] = useState<Platform | null>(null);
-  const [checking, setChecking] = useState(false);
+  const { play, checking, dialog, dialogOpen } = useLaunchFlow();
   // Se guarda la URL que falló para no arrastrar el error a otro juego.
   const [failedHero, setFailedHero] = useState<string | null>(null);
 
@@ -183,29 +181,15 @@ export function GameDetail() {
   const detailsState = useGameDetails(game);
   const details = detailsState?.details;
 
-  const launch = useCallback(
-    (lightMode: boolean) => {
-      if (!game || !platform) return;
-      navigate(`/cargando/${game.id}?plataforma=${platform}&ligero=${lightMode ? 1 : 0}`);
-    },
-    [game, platform, navigate],
-  );
+  // El fondo de la app toma el arte de este juego.
+  const gameId = game?.id;
+  useEffect(() => {
+    if (gameId) setActiveGame(gameId);
+  }, [gameId, setActiveGame]);
 
-  const onPlay = async () => {
-    if (!platform) return;
-    if (lightModePref === "always") return launch(true);
-    if (lightModePref === "never") return launch(false);
-    setChecking(true);
-    try {
-      const load = await checkClientLoad(platform);
-      if (load.high) setAskPlatform(platform);
-      else launch(false);
-    } finally {
-      setChecking(false);
-    }
+  const onPlay = () => {
+    if (game && platform) void play(game.id, platform);
   };
-
-  const dismissDialog = useCallback(() => setAskPlatform(null), []);
 
   // Volver a donde estaba el usuario (normalmente la biblioteca, con su búsqueda y filtros).
   const goBack = useCallback(() => {
@@ -216,13 +200,13 @@ export function GameDetail() {
 
   // Esc también vuelve, salvo con el diálogo abierto (ahí Esc solo cierra el diálogo).
   useEffect(() => {
-    if (askPlatform) return;
+    if (dialogOpen) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") goBack();
     };
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
-  }, [askPlatform, goBack]);
+  }, [dialogOpen, goBack]);
 
   if (!game) {
     return (
@@ -242,33 +226,45 @@ export function GameDetail() {
 
   return (
     <div className={styles.page}>
-      <div className={styles.frame} aria-hidden={askPlatform ? true : undefined}>
+      <div className={styles.frame} aria-hidden={dialogOpen ? true : undefined}>
         <div className={styles.topBar}>
           <button type="button" className={styles.back} onClick={goBack} title="Volver (Esc)">
             <BackGlyph className={styles.backIcon} />
             Volver
           </button>
           <p className={styles.metrics} aria-label="Consumo de LPhoton">
-            CPU: {metrics ? `${metrics.cpuPercent.toFixed(1)}%` : "—"} | RAM: {metrics ? `${metrics.ramMb} MB` : "—"} |
-            PLATAFORMA: {platform ? PLATFORM_NAMES[platform].toUpperCase() : "—"}
+            <span>
+              CPU <b>{metrics ? `${metrics.cpuPercent.toFixed(1)}%` : "—"}</b>
+            </span>
+            <span>
+              RAM <b>{metrics ? `${metrics.ramMb} MB` : "—"}</b>
+            </span>
+            <span>
+              Plataforma <b>{platform ? PLATFORM_NAMES[platform] : "—"}</b>
+            </span>
           </p>
         </div>
         <article className={styles.card}>
-          {failedHero === game.heroUrl || !game.heroUrl ? (
-            <div className={styles.heroFallback} aria-hidden="true">
-              <span>{game.title}</span>
+          <div className={styles.banner}>
+            {failedHero === game.heroUrl || !game.heroUrl ? (
+              <div className={styles.heroFallback} aria-hidden="true" />
+            ) : (
+              <img
+                className={styles.hero}
+                src={game.heroUrl}
+                alt=""
+                decoding="async"
+                draggable={false}
+                width={1600}
+                height={620}
+                onError={() => setFailedHero(game.heroUrl)}
+              />
+            )}
+            <div className={styles.heading}>
+              <PlatformBadges platforms={entry?.platforms ?? []} />
+              <h1 className={styles.title}>{game.title}</h1>
             </div>
-          ) : (
-            <img
-              className={styles.hero}
-              src={game.heroUrl}
-              alt=""
-              decoding="async"
-              width={1600}
-              height={620}
-              onError={() => setFailedHero(game.heroUrl)}
-            />
-          )}
+          </div>
           <div className={styles.info}>
             {needsInstall ? (
               <InstallButton
@@ -282,10 +278,6 @@ export function GameDetail() {
               <PlayButton onClick={onPlay} disabled={!platform || checking} className={styles.play} />
             )}
             <div className={styles.text}>
-              <div className={styles.heading}>
-                <h1 className={styles.title}>{game.title}</h1>
-                <PlatformBadges platforms={entry?.platforms ?? []} />
-              </div>
               {needsInstall && platform && (
                 <InstallInfo
                   platform={platform}
@@ -306,40 +298,27 @@ export function GameDetail() {
                 Soluciones y mods →
               </Link>
             </div>
-            <ul className={styles.meta}>
-              {details?.genre && <li>Género: {details.genre}</li>}
-              {details?.developer && <li>Desarrollador: {details.developer}</li>}
-              {details?.protagonist && <li>Protagonista: {details.protagonist}</li>}
-              {details?.releaseYear && <li>Año de lanzamiento: {details.releaseYear}</li>}
-              {source && <li>Tiempo jugado: {formatPlaytime(source.playtimeMinutes)}</li>}
-            </ul>
+            <dl className={styles.meta}>
+              {source && <Fact label="Tiempo jugado" value={formatPlaytime(source.playtimeMinutes)} />}
+              {details?.genre && <Fact label="Género" value={details.genre} />}
+              {details?.developer && <Fact label="Desarrollador" value={details.developer} />}
+              {details?.protagonist && <Fact label="Protagonista" value={details.protagonist} />}
+              {details?.releaseYear && <Fact label="Lanzamiento" value={details.releaseYear} />}
+            </dl>
           </div>
         </article>
       </div>
 
-      {askPlatform && (
-        <Dialog
-          title="¿Optimizar RAM?"
-          onDismiss={dismissDialog}
-          actions={
-            <>
-              <SkipButton onClick={() => launch(false)} />
-              <LightModeButton onClick={() => launch(true)} />
-            </>
-          }
-        >
-          <p>
-            LPhoton detectó un alto consumo de recursos de {PLATFORM_NAMES[askPlatform]} en segundo plano. ¿Deseas
-            activar el modo ligero para cerrar los procesos innecesarios?
-          </p>
-        </Dialog>
-      )}
+      {dialog}
     </div>
   );
 }
 
-function formatPlaytime(minutes: number): string {
-  if (minutes <= 0) return "sin registrar";
-  if (minutes < 60) return `${minutes} min`;
-  return `${Math.round(minutes / 60).toLocaleString("es")} h`;
+function Fact({ label, value }: { label: string; value: string | number }) {
+  return (
+    <div className={styles.fact}>
+      <dt>{label}</dt>
+      <dd>{value}</dd>
+    </div>
+  );
 }

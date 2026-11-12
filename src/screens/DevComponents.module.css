@@ -1,9 +1,9 @@
-/* Página de referencia sobre Neutral claro, como la maqueta 00. */
+/* Página de referencia de componentes, sobre el fondo de la app. */
 .page {
   height: 100%;
-  padding: var(--space-5) var(--space-2) var(--space-7);
+  padding: var(--space-5) var(--space-4) var(--space-7);
   overflow: auto;
-  background: var(--surface-dev);
+  background: var(--ambient-glow), var(--surface-app);
 }
 
 .navbars {
@@ -45,7 +45,7 @@
   gap: var(--space-5);
   padding: var(--space-2);
   border-radius: var(--radius-md);
-  background: var(--color-navbar);
+  background: var(--surface-raised);
 }
 
 .lightLogo {

@@ -1,12 +1,23 @@
+/* El ambiente va detrás; la barra y el contenido flotan encima con aire alrededor. */
 .shell {
+  position: relative;
+  isolation: isolate;
   display: flex;
   flex-direction: column;
   height: 100%;
 }
 
+.top {
+  position: relative;
+  z-index: 2;
+  flex: none;
+  padding: var(--shell-gap) var(--shell-gap) 0;
+}
+
 /* position: relative para que el diálogo desenfoque solo el contenido, no la navbar. */
 .main {
   position: relative;
+  z-index: 1;
   flex: 1;
   min-height: 0;
 }

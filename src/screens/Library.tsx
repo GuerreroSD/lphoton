@@ -1,20 +1,22 @@
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { TextButton } from "../components/Button";
 import { GameCover } from "../components/GameCover";
 import { GameListItem } from "../components/GameListItem";
+import { useLaunchFlow } from "../components/LaunchFlow";
 import { LibraryFilters } from "../components/LibraryFilters";
 import { PlatformHint } from "../components/PlatformHint";
 import { Toast } from "../components/Toast";
 import { reportStartup } from "../lib/library";
 import { NO_FILTERS, useAppStore } from "../store/appStore";
 import { matchesFilters, matchesQuery, useLibrary } from "../store/useLibrary";
+import type { Game, Platform } from "../types";
 import styles from "./Library.module.css";
 
 // RNF7: se mide una sola vez, en el primer pintado con la biblioteca visible.
 let startupReported = false;
 
-/** Biblioteca unificada — maqueta 01. */
+/** Biblioteca unificada: panel de vidrio con la lista y grilla de portadas sobre el ambiente. */
 export function Library() {
   const { status, alphabetical, recent } = useLibrary();
   const searchOpen = useAppStore((s) => s.searchOpen);
@@ -27,6 +29,16 @@ export function Library() {
   const setFilters = useAppStore((s) => s.setFilters);
   const linked = useAppStore((s) => s.linkedPlatforms);
   const searchRef = useRef<HTMLInputElement>(null);
+  const { play, dialog, dialogOpen } = useLaunchFlow();
+  const onPlay = useCallback((game: Game, platform: Platform) => void play(game.id, platform), [play]);
+
+  // Al abrir, el juego activo es el más reciente: el fondo nunca parte vacío.
+  const firstId = recent[0]?.game.id;
+  useEffect(() => {
+    if (!firstId) return;
+    const { activeGameId, games, setActiveGame } = useAppStore.getState();
+    if (!activeGameId || !games.some((g) => g.id === activeGameId)) setActiveGame(firstId);
+  }, [firstId]);
 
   useEffect(() => {
     if (startupReported || status !== "ready") return;
@@ -47,7 +59,7 @@ export function Library() {
 
   return (
     <div className={styles.library}>
-      <aside className={styles.sidebar} aria-label="Lista de juegos">
+      <aside className={styles.sidebar} aria-label="Lista de juegos" aria-hidden={dialogOpen ? true : undefined}>
         <h1 className="visually-hidden">Biblioteca</h1>
         {searchOpen && (
           <div className={styles.search}>
@@ -85,7 +97,7 @@ export function Library() {
         </div>
       </aside>
 
-      <section className={styles.content} aria-label="Portadas">
+      <section className={styles.content} aria-label="Portadas" aria-hidden={dialogOpen ? true : undefined}>
         {status === "error" && <p className={styles.empty}>No pudimos cargar tu biblioteca. Intenta de nuevo.</p>}
         {(status === "loading" || status === "idle") && (
           // Silueta de la grilla mientras se lee la caché: evita el salto al pintar las portadas.
@@ -127,10 +139,11 @@ export function Library() {
         )}
         <div className={styles.grid}>
           {grid.map((e) => (
-            <GameCover key={e.game.id} game={e.game} platforms={e.platforms} />
+            <GameCover key={e.game.id} game={e.game} platforms={e.platforms} onPlay={onPlay} />
           ))}
         </div>
       </section>
+      {dialog}
     </div>
   );
 }

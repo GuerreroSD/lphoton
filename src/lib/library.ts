@@ -92,3 +92,22 @@ export async function reportStartup(games: number): Promise<number | null> {
   if (!inTauri) return null;
   return invoke<number>("report_startup", { games });
 }
+
+/** Tienda desde la que se lanza: la vinculada donde está instalado; si no, la primera vinculada. */
+export function launchSource(game: Game, platforms: Platform[]) {
+  return (
+    game.sources.find((s) => s.installed && platforms.includes(s.platform)) ??
+    game.sources.find((s) => platforms.includes(s.platform))
+  );
+}
+
+/** Tiempo jugado en las plataformas indicadas (minutos). */
+export function playtimeMinutesOn(game: Game, platforms: Platform[]): number {
+  return game.sources.reduce((sum, s) => (platforms.includes(s.platform) ? sum + s.playtimeMinutes : sum), 0);
+}
+
+export function formatPlaytime(minutes: number): string {
+  if (minutes <= 0) return "sin registrar";
+  if (minutes < 60) return `${minutes} min`;
+  return `${Math.round(minutes / 60).toLocaleString("es")} h`;
+}

@@ -60,10 +60,10 @@ export function NavBar({ demoSelected }: NavBarProps) {
   return (
     <header className={styles.navbar}>
       {isDemo ? (
-        <Logo boxed />
+        <Logo />
       ) : (
         <Link to="/biblioteca" className={styles.logoLink} aria-label="LPhoton, ir a la biblioteca">
-          <Logo boxed />
+          <Logo />
         </Link>
       )}
       <nav className={styles.items} aria-label="Secciones">

@@ -1,0 +1,43 @@
+/* Detrás de toda la app. contain: nada de aquí afecta al layout ni al pintado del resto. */
+.ambient {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  background: var(--surface-app);
+  pointer-events: none;
+  contain: strict;
+}
+
+/* Luces de la marca: lo único que se ve si el juego activo no tiene arte. */
+.glow {
+  position: absolute;
+  inset: 0;
+  background: var(--ambient-glow);
+}
+
+/* Más grande que la ventana, para que el desenfoque no deje bordes claros. */
+.layer {
+  position: absolute;
+  top: -14%;
+  left: -14%;
+  width: 128%;
+  height: 128%;
+  max-width: none;
+  object-fit: cover;
+  filter: blur(var(--ambient-blur)) saturate(1.7);
+  opacity: 0;
+  transition: opacity var(--duration-ambient) ease;
+  will-change: opacity;
+}
+
+.layer[data-on] {
+  opacity: var(--ambient-opacity);
+}
+
+/* Oscurece hacia abajo y hacia los bordes: el texto se lee sobre cualquier arte. */
+.veil {
+  position: absolute;
+  inset: 0;
+  background: var(--ambient-veil);
+}

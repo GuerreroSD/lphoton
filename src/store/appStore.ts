@@ -58,6 +58,8 @@ interface AppState {
   syncWarning: string | null;
   searchOpen: boolean;
   query: string;
+  /** Juego activo: su arte tiñe el fondo y su portada lleva el brillo de neón. */
+  activeGameId: string | null;
 
   setUsername: (username: string | null) => void;
   setPlatformLinked: (platform: Platform, linked: boolean) => void;
@@ -72,6 +74,7 @@ interface AppState {
   togglePlatformFilter: (platform: Platform) => void;
   setFilters: (filters: Partial<LibraryFilters>) => void;
   dismissPlatformHint: (platform: Platform) => void;
+  setActiveGame: (id: string | null) => void;
 }
 
 export const useAppStore = create<AppState>()(
@@ -90,6 +93,7 @@ export const useAppStore = create<AppState>()(
       syncWarning: null,
       searchOpen: false,
       query: "",
+      activeGameId: null,
 
       setUsername: (username) => set({ username }),
       setPlatformLinked: (platform, linked) =>
@@ -148,6 +152,7 @@ export const useAppStore = create<AppState>()(
       setFilters: (filters) => set((s) => ({ filters: { ...s.filters, ...filters } })),
       dismissPlatformHint: (platform) =>
         set((s) => ({ dismissedPlatformHints: Array.from(new Set([...s.dismissedPlatformHints, platform])) })),
+      setActiveGame: (activeGameId) => set({ activeGameId }),
     }),
     {
       name: "lphoton-settings",
@@ -174,3 +179,18 @@ export const useAppStore = create<AppState>()(
     },
   ),
 );
+
+// Pasar el cursor por encima de varias portadas camino a otra no debe cambiar el
+// fondo en cada una: el juego se activa solo si el cursor se queda un momento.
+const ACTIVATE_DELAY_MS = 110;
+let activateTimer: ReturnType<typeof setTimeout> | undefined;
+
+export function activateGameSoon(id: string) {
+  clearTimeout(activateTimer);
+  if (useAppStore.getState().activeGameId === id) return;
+  activateTimer = setTimeout(() => useAppStore.getState().setActiveGame(id), ACTIVATE_DELAY_MS);
+}
+
+export function cancelActivateGame() {
+  clearTimeout(activateTimer);
+}

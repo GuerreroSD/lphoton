@@ -1,5 +1,6 @@
 import { useLayoutEffect } from "react";
 import { BrowserRouter, Navigate, Outlet, Route, Routes, useLocation } from "react-router-dom";
+import { Ambient } from "./components/Ambient";
 import { NavBar } from "./components/NavBar";
 import { useAppStore } from "./store/appStore";
 import { DevComponents } from "./screens/DevComponents";
@@ -22,7 +23,10 @@ function MainLayout() {
   const { pathname } = useLocation();
   return (
     <div className={styles.shell}>
-      <NavBar />
+      <Ambient />
+      <div className={styles.top}>
+        <NavBar />
+      </div>
       <main className={styles.main}>
         {/* key: la animación de entrada se repite al cambiar de pantalla. */}
         <div key={pathname} className={styles.screen}>

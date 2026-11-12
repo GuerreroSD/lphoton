@@ -1,31 +1,70 @@
 .item {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
-  column-gap: var(--space-4);
-  min-height: clamp(38px, 2.6vw, 44px);
-  padding: var(--space-1) var(--space-3);
-  border-radius: var(--radius-sm);
-  color: var(--color-accent);
+  column-gap: var(--space-3);
+  min-height: clamp(42px, 3vw, 48px);
+  padding: var(--space-1) var(--space-3) var(--space-1) var(--space-2);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
   text-decoration: none;
-  transition: box-shadow var(--duration-base) var(--ease-out);
+  transition:
+    box-shadow var(--duration-base) var(--ease-out),
+    transform var(--duration-fast) var(--ease-out);
 }
 
 .item:hover,
 .item:focus-visible {
   outline: none;
   background: var(--surface-hover);
-  box-shadow: var(--shadow-row-active);
 }
 
-/* Sin instalar: atenuado (5.0:1 sobre el neutral oscuro). */
+.item:active {
+  transform: scale(0.985);
+}
+
+/* Juego activo: el mismo que enciende la portada y tiñe el fondo. */
+.item[data-active] {
+  background: var(--surface-hover);
+  box-shadow: var(--shadow-row-active);
+  color: var(--color-accent);
+}
+
+/* Miniatura de la portada (2:3). Sin arte queda el degradado de la marca. */
+.thumb {
+  flex: none;
+  width: clamp(24px, 1.75vw, 28px);
+  aspect-ratio: 2 / 3;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: linear-gradient(150deg, rgb(var(--palette-accent-rgb) / 0.5), rgb(var(--palette-alert-rgb) / 0.5));
+  box-shadow: 0 0 0 1px rgb(var(--palette-ink-rgb) / 0.1);
+}
+
+.thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Sin instalar: atenuado; vuelve a su color al activarlo. */
 .notInstalled {
   color: var(--state-disabled-text);
 }
 
+.notInstalled .thumb {
+  opacity: 0.55;
+}
+
 .notInstalled:hover,
-.notInstalled:focus-visible {
+.notInstalled:focus-visible,
+.notInstalled[data-active] {
   color: var(--color-accent);
+}
+
+.notInstalled:hover .thumb,
+.notInstalled[data-active] .thumb {
+  opacity: 1;
 }
 
 .title {

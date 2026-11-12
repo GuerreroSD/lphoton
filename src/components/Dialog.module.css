@@ -6,6 +6,7 @@
   align-items: center;
   justify-content: center;
   padding: var(--space-5);
+  background: rgb(var(--color-bg-dark-rgb) / 0.45);
   -webkit-backdrop-filter: blur(var(--blur-backdrop));
   backdrop-filter: blur(var(--blur-backdrop));
   animation: fade-in var(--duration-base) var(--ease-out);

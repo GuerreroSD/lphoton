@@ -1,14 +1,18 @@
 /*
- * Logo pegado a la izquierda, secciones centradas en el espacio que queda y
- * lupa a la derecha. Todo escala con el ancho de la ventana (maximizada o no).
+ * Barra de vidrio oscuro que flota sobre el ambiente: logo a la izquierda,
+ * secciones centradas en el espacio que queda y lupa a la derecha.
  */
 .navbar {
   display: flex;
   align-items: center;
   gap: clamp(var(--space-4), 2.4vw, var(--space-7));
   height: var(--navbar-height);
-  padding: 0 clamp(var(--space-4), 2.5vw, var(--space-7));
+  padding: 0 var(--space-3) 0 clamp(var(--space-4), 1.6vw, var(--space-5));
+  border-radius: var(--radius-xl);
   background: var(--surface-navbar);
+  -webkit-backdrop-filter: var(--glass-filter);
+  backdrop-filter: var(--glass-filter);
+  box-shadow: var(--glass-edge);
   flex: none;
 }
 
@@ -18,12 +22,22 @@
   justify-content: center;
   align-items: center;
   min-width: 0;
-  gap: clamp(var(--space-3), 2.6vw, var(--space-7));
+  gap: clamp(var(--space-1), 0.8vw, var(--space-3));
 }
 
 .logoLink {
   display: inline-flex;
   flex: none;
+  padding: var(--space-1) var(--space-2);
   border-radius: var(--radius-md);
   text-decoration: none;
+  transition: transform var(--duration-base) var(--ease-out);
+}
+
+.logoLink:hover {
+  transform: translateX(2px);
+}
+
+.logoLink:active {
+  transform: translateX(0);
 }

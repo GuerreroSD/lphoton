@@ -32,7 +32,7 @@ export function PlatformIcon({ platform, ...props }: IconProps & { platform: Pla
 
 export function SearchGlyph(props: IconProps) {
   return (
-    <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" strokeWidth="3.5" aria-hidden="true" focusable="false" {...props}>
+    <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" strokeWidth="4.5" aria-hidden="true" focusable="false" {...props}>
       <circle cx="20" cy="20" r="15" />
       <path d="M31 31 L44 42" strokeLinecap="round" />
     </svg>
@@ -67,6 +67,15 @@ export function CheckGlyph(props: IconProps) {
   return (
     <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.2" aria-hidden="true" focusable="false" {...props}>
       <path d="M2.5 8.5l3.5 3.5 7.5-8" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+export function ClockGlyph(props: IconProps) {
+  return (
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true" focusable="false" {...props}>
+      <circle cx="8" cy="8" r="6.2" />
+      <path d="M8 4.6V8l2.3 1.6" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }

@@ -1,9 +1,11 @@
+/* Mismas luces de la marca que el fondo de la app, antes de tener una biblioteca. */
 .screen {
   display: flex;
   align-items: center;
   justify-content: center;
   height: 100%;
   padding: var(--space-6);
+  background: var(--ambient-glow);
   overflow-y: auto;
 }
 
@@ -14,8 +16,9 @@
   width: min(560px, 100%);
   margin: auto;
   padding: var(--space-6) var(--space-7);
-  border: 1px solid var(--border-container);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-xl);
+  background: var(--glass-bg);
+  box-shadow: var(--glass-edge);
 }
 
 .logo {

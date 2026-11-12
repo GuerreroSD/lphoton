@@ -13,7 +13,9 @@
   --palette-deep: #4a1550; /* Morado intenso */
   --palette-neutral-light: #dbc5dd; /* Neutral claro */
   --palette-neutral-dark: #2d1b36; /* Neutral oscuro */
-  --palette-navbar: #af89c5; /* Lavanda barra superior (tomado de maquetas, confirmar con diseño) */
+  --palette-navbar: #af89c5; /* Lavanda (pantalla de carga y barras de progreso) */
+  --palette-void: #06070d; /* Negro azulado: fondo profundo del launcher */
+  --palette-ink: #eef1f8; /* Blanco frío: títulos sobre el arte de los juegos */
 
   /* Canales RGB para transparencias: rgb(var(--x-rgb) / 0.5) */
   --palette-primary-rgb: 182 54 199;
@@ -25,6 +27,8 @@
   --palette-neutral-dark-rgb: 45 27 54;
   --palette-navbar-rgb: 175 137 197;
   --palette-black-rgb: 0 0 0;
+  --palette-void-rgb: 6 7 13;
+  --palette-ink-rgb: 238 241 248;
 
   /* ── Tokens semánticos (LPHOTON.md §5.1) ────────────────────────── */
   --color-primary: var(--palette-primary);
@@ -33,7 +37,7 @@
   --color-success: var(--palette-success);
   --color-deep: var(--palette-deep);
   --color-bg-light: var(--palette-neutral-light);
-  --color-bg-dark: var(--palette-neutral-dark);
+  --color-bg-dark: var(--palette-void);
   --color-navbar: var(--palette-navbar);
 
   --color-primary-rgb: var(--palette-primary-rgb);
@@ -41,33 +45,61 @@
   --color-alert-rgb: var(--palette-alert-rgb);
   --color-success-rgb: var(--palette-success-rgb);
   --color-deep-rgb: var(--palette-deep-rgb);
-  --color-bg-dark-rgb: var(--palette-neutral-dark-rgb);
+  --color-bg-dark-rgb: var(--palette-void-rgb);
   --color-bg-light-rgb: var(--palette-neutral-light-rgb);
 
   /* ── Roles de superficie y texto (cambian con el tema) ─────────── */
-  --surface-app: var(--color-bg-dark); /* fondo de pantallas */
-  --surface-container: var(--color-bg-dark); /* botones, paneles, modales */
-  --surface-sunken: rgb(var(--palette-black-rgb) / 0.18); /* campos de texto */
-  --surface-navbar: var(--color-navbar);
+  --surface-app: var(--palette-void); /* fondo de pantallas */
+  --surface-container: #12131c; /* botones, paneles y modales (opaco) */
+  --surface-sunken: rgb(var(--palette-black-rgb) / 0.32); /* campos de texto */
+  --surface-navbar: var(--glass-bg);
   --surface-chip: var(--color-navbar); /* tarjeta lavanda de la pantalla de carga */
   --surface-dev: var(--color-bg-light); /* fondo de la página de componentes (maqueta 00) */
-  --surface-raised: rgb(var(--palette-navbar-rgb) / 0.07); /* tarjetas y filas resaltadas */
-  --surface-hover: rgb(var(--palette-accent-rgb) / 0.08); /* fila bajo el cursor */
-  --text-strong: var(--color-accent); /* texto principal sobre fondos oscuros (11.28:1) */
-  --text-muted: var(--palette-neutral-light); /* texto secundario: ayudas y notas (9.9:1; 8.9:1 en tarjetas) */
+  --surface-raised: rgb(var(--palette-ink-rgb) / 0.045); /* tarjetas y filas resaltadas */
+  --surface-hover: rgb(var(--palette-ink-rgb) / 0.07); /* fila bajo el cursor */
+  --text-strong: var(--color-accent); /* texto principal sobre fondos oscuros */
+  --text-primary: var(--palette-ink); /* nombres de juegos y títulos sobre el arte */
+  --text-muted: var(--palette-neutral-light); /* texto secundario: ayudas y notas */
   --text-on-chip: var(--color-deep); /* texto sobre lavanda (4.76:1) */
-  --text-on-primary: var(--color-bg-dark); /* texto del botón JUGAR (3.28:1, excepción aprobada) */
+  --text-on-primary: var(--palette-void); /* texto del botón JUGAR, sobre celeste */
   --border-container: var(--color-accent);
   --border-subtle: rgb(var(--color-accent-rgb) / 0.35);
-  --divider: rgb(var(--palette-navbar-rgb) / 0.35);
+  --divider: rgb(var(--palette-ink-rgb) / 0.1);
   --platform-icon: var(--color-bg-light);
-  --cover-placeholder: rgb(var(--palette-navbar-rgb) / 0.12);
+  --scrollbar-thumb: rgb(var(--palette-ink-rgb) / 0.16);
+  --scrollbar-thumb-hover: rgb(var(--palette-accent-rgb) / 0.6);
+  --cover-placeholder: rgb(var(--palette-ink-rgb) / 0.06);
   --cover-scrim: linear-gradient(
     to top,
-    rgb(var(--palette-neutral-dark-rgb) / 0.96) 0%,
-    rgb(var(--palette-neutral-dark-rgb) / 0.82) 55%,
+    rgb(var(--palette-void-rgb) / 0.98) 0%,
+    rgb(var(--palette-void-rgb) / 0.94) 58%,
+    rgb(var(--palette-void-rgb) / 0.6) 80%,
     transparent 100%
-  ); /* franja con el nombre sobre la portada (siempre oscura) */
+  ); /* velo bajo el nombre y el botón de la portada (siempre oscuro) */
+
+  /* ── Vidrio oscuro: barra superior, panel lateral y ficha ───────── */
+  --glass-bg: rgb(var(--palette-void-rgb) / 0.52);
+  --glass-bg-strong: rgb(var(--palette-void-rgb) / 0.72);
+  --glass-filter: blur(28px) saturate(1.5);
+  /* Filo de 1 px y un brillo en el borde superior, como un vidrio iluminado desde arriba. */
+  --glass-edge:
+    inset 0 0 0 1px rgb(var(--palette-ink-rgb) / 0.09), inset 0 1px 0 0 rgb(var(--palette-ink-rgb) / 0.12),
+    0 18px 40px -18px rgb(var(--palette-black-rgb) / 0.7);
+
+  /* ── Ambiente: arte del juego activo, desenfocado detrás de todo ─ */
+  --ambient-opacity: 0.62;
+  --ambient-blur: 72px;
+  --ambient-veil:
+    radial-gradient(120% 85% at 50% 0%, transparent 0%, rgb(var(--palette-void-rgb) / 0.5) 72%),
+    linear-gradient(to bottom, rgb(var(--palette-void-rgb) / 0.28) 0%, rgb(var(--palette-void-rgb) / 0.82) 100%);
+  --ambient-glow:
+    radial-gradient(60% 55% at 8% 0%, rgb(var(--palette-accent-rgb) / 0.2) 0, transparent 70%),
+    radial-gradient(55% 60% at 100% 100%, rgb(var(--palette-alert-rgb) / 0.18) 0, transparent 70%);
+
+  /* ── Neón de la carátula activa: celeste y rosado del logo ──────── */
+  --neon-ring: linear-gradient(140deg, var(--palette-accent) 0%, var(--palette-accent) 30%, var(--palette-alert) 100%);
+  --neon-glow:
+    -10px -8px 34px -6px rgb(var(--palette-accent-rgb) / 0.6), 12px 14px 44px -6px rgb(var(--palette-alert-rgb) / 0.55);
 
   /* Estado "deshabilitado / seleccionado" (maqueta 00) */
   --state-disabled-bg: rgb(var(--palette-neutral-dark-rgb) / 0.4);
@@ -101,7 +133,7 @@
   /* Tamaños por rol */
   --fs-display: 75px; /* Display – Faster One */
   --fs-logo-lg: 56px; /* Logo en la pantalla de carga */
-  --fs-logo-nav: clamp(30px, 2.8vw, 46px); /* Logo de la navbar: crece con la ventana */
+  --fs-logo-nav: clamp(24px, 2.1vw, 32px); /* Logo de la navbar: crece con la ventana */
   /*
    * El mínimo de cada rol es el valor de la guía (24 / 16 / 12 px). En ventanas
    * grandes crecen un poco con el ancho para que la interfaz no quede diminuta.
@@ -121,23 +153,27 @@
   --radius-sm: 4px;
   --radius-md: 8px; /* botones */
   --radius-lg: 12px; /* contenedores, modales */
+  --radius-xl: 18px; /* paneles de vidrio */
   --radius-pill: 999px;
 
   /* ── Sombras (estados hover) ────────────────────────────────────── */
   --shadow-nav-hover: 2px 3px 0 0 var(--color-accent), 2px 3px 8px 0 rgb(var(--color-accent-rgb) / 0.35);
-  --shadow-play-hover: 3px 4px 0 0 rgb(var(--color-bg-dark-rgb) / 0.95);
+  --shadow-play-hover: 3px 4px 0 0 var(--palette-alert), 0 0 26px 0 rgb(var(--palette-accent-rgb) / 0.55);
   --shadow-skip-hover: 2px 3px 0 0 rgb(var(--color-alert-rgb) / 0.55), 0 0 10px 0 rgb(var(--color-alert-rgb) / 0.35);
   --shadow-light-hover: 2px 3px 0 0 rgb(var(--color-accent-rgb) / 0.55), 0 0 10px 0 rgb(var(--color-success-rgb) / 0.35);
   --shadow-search-hover: 0 0 14px 0 rgb(var(--color-accent-rgb) / 0.55);
-  --shadow-cover-focus: 0 0 0 2px var(--color-accent), 0 10px 24px 0 rgb(var(--palette-black-rgb) / 0.4);
+  --shadow-cover: 0 0 0 1px rgb(var(--palette-ink-rgb) / 0.08), 0 14px 28px -14px rgb(var(--palette-black-rgb) / 0.9);
   --shadow-row-active: inset 3px 0 0 var(--color-accent);
   --shadow-card-success: 0 4px 14px 0 rgb(var(--color-success-rgb) / 0.18);
-  --shadow-modal: 0 10px 30px 0 rgb(var(--palette-black-rgb) / 0.45);
+  --shadow-modal: inset 0 0 0 1px rgb(var(--palette-ink-rgb) / 0.1), 0 24px 60px 0 rgb(var(--palette-black-rgb) / 0.7);
 
-  /* ── Movimiento (≤150 ms; solo transform, opacity, box-shadow) ─── */
+  /* ── Movimiento (solo transform, opacity y box-shadow) ──────────── */
   --duration-fast: 120ms;
   --duration-base: 150ms;
+  --duration-smooth: 260ms; /* escala de la portada bajo el cursor */
+  --duration-ambient: 800ms; /* fundido del arte de fondo */
   --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --ease-soft: cubic-bezier(0.22, 1, 0.36, 1);
 
   /* ── Espaciado y layout ─────────────────────────────────────────── */
   --space-1: 4px;
@@ -149,12 +185,13 @@
   --space-7: 48px;
   --space-8: 64px;
 
-  --navbar-height: 96px;
-  --sidebar-width: clamp(300px, 21vw, 400px);
+  --navbar-height: clamp(56px, 4.6vw, 64px);
+  --shell-gap: clamp(var(--space-3), 1.1vw, var(--space-4)); /* aire entre los paneles y el borde de la ventana */
+  --sidebar-width: clamp(292px, 23vw, 372px);
   --cover-width: 176px; /* ancho de la maqueta 01 */
   --cover-min: clamp(176px, 12.5vw, 240px); /* ancho mínimo de columna en la grilla */
   --page-width: clamp(760px, 58vw, 1080px); /* columna de Configuraciones y Perfil */
-  --blur-backdrop: 4px;
+  --blur-backdrop: 10px;
 
   color-scheme: dark;
 }
@@ -182,23 +219,37 @@
 
   --surface-app: var(--palette-neutral-light);
   --surface-container: var(--palette-neutral-light);
+  --text-primary: var(--palette-deep);
+  --glass-bg: rgb(var(--palette-neutral-light-rgb) / 0.58);
+  --glass-bg-strong: rgb(var(--palette-neutral-light-rgb) / 0.8);
+  --glass-edge:
+    inset 0 0 0 1px rgb(var(--palette-deep-rgb) / 0.16), inset 0 1px 0 0 rgb(255 255 255 / 0.5),
+    0 18px 40px -22px rgb(var(--palette-deep-rgb) / 0.5);
+  --ambient-opacity: 0.4;
+  --ambient-veil: linear-gradient(
+    to bottom,
+    rgb(var(--palette-neutral-light-rgb) / 0.35) 0%,
+    rgb(var(--palette-neutral-light-rgb) / 0.8) 100%
+  );
   --surface-sunken: rgb(var(--palette-deep-rgb) / 0.07);
   --surface-raised: rgb(var(--palette-deep-rgb) / 0.05);
   --surface-hover: rgb(var(--palette-deep-rgb) / 0.08);
   --text-strong: var(--palette-deep);
   --text-muted: rgb(var(--palette-deep-rgb) / 0.82); /* 5.8:1 sobre el neutral claro; 5.4:1 en tarjetas */
-  /* JUGAR conserva el texto oscuro de la maqueta. */
-  --text-on-primary: var(--palette-neutral-dark);
+  /* JUGAR conserva el celeste con texto oscuro. */
+  --text-on-primary: var(--palette-void);
   --border-container: var(--palette-deep);
   --border-subtle: rgb(var(--palette-deep-rgb) / 0.35);
   --divider: rgb(var(--palette-deep-rgb) / 0.22);
   --platform-icon: var(--palette-deep);
+  --scrollbar-thumb: rgb(var(--palette-deep-rgb) / 0.3);
+  --scrollbar-thumb-hover: rgb(var(--palette-deep-rgb) / 0.6);
   --cover-placeholder: rgb(var(--palette-deep-rgb) / 0.08);
   --state-disabled-bg: rgb(var(--palette-deep-rgb) / 0.1);
   --state-disabled-text: rgb(var(--palette-deep-rgb) / 0.78);
   --logo-gradient: var(--logo-gradient-on-light);
-  --shadow-play-hover: 3px 4px 0 0 rgb(var(--palette-deep-rgb) / 0.9);
-  --shadow-modal: 0 10px 30px 0 rgb(var(--palette-deep-rgb) / 0.3);
-  --shadow-cover-focus: 0 0 0 2px var(--palette-deep), 0 10px 24px 0 rgb(var(--palette-deep-rgb) / 0.3);
+  --shadow-play-hover: 3px 4px 0 0 var(--palette-deep), 0 0 22px 0 rgb(var(--palette-accent-rgb) / 0.6);
+  --shadow-modal: inset 0 0 0 1px rgb(var(--palette-deep-rgb) / 0.2), 0 24px 60px 0 rgb(var(--palette-deep-rgb) / 0.35);
+  --shadow-cover: 0 0 0 1px rgb(var(--palette-deep-rgb) / 0.18), 0 14px 28px -16px rgb(var(--palette-deep-rgb) / 0.6);
   color-scheme: light;
 }

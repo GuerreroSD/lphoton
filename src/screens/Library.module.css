@@ -4,23 +4,34 @@
   min-height: 0;
 }
 
-/* Panel izquierdo separado por una línea vertical (maqueta 01). */
+/* Panel izquierdo: vidrio oscuro que flota sobre el ambiente. */
 .sidebar {
+  display: flex;
+  flex-direction: column;
   flex: none;
   width: var(--sidebar-width);
-  padding: var(--space-6) var(--space-4) var(--space-6) var(--space-5);
-  border-right: 2px solid var(--divider);
+  margin: var(--shell-gap) 0 var(--shell-gap) var(--shell-gap);
+  padding: var(--space-4) var(--space-2) var(--space-3) var(--space-3);
+  border-radius: var(--radius-xl);
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: var(--glass-filter);
+  backdrop-filter: var(--glass-filter);
+  box-shadow: var(--glass-edge);
+  min-height: 0;
+}
+
+/* Solo la lista se desplaza: los filtros quedan siempre a la vista. */
+.list {
+  flex: 1;
+  min-height: 0;
+  margin: 0;
+  padding: 0 var(--space-1) 0 0;
+  list-style: none;
   overflow-y: auto;
 }
 
-.list {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
 .search {
-  margin-bottom: var(--space-4);
+  margin: 0 var(--space-1) var(--space-3) 0;
 }
 
 .searchInput {
@@ -31,9 +42,10 @@
   border-radius: var(--radius-md);
   background: var(--surface-sunken);
   box-shadow: inset 0 0 0 1px var(--border-subtle);
-  color: var(--color-accent);
+  color: var(--text-primary);
   font-size: var(--fs-body-sm);
   user-select: text;
+  transition: box-shadow var(--duration-base) var(--ease-out);
 }
 
 .searchInput::placeholder {
@@ -42,14 +54,20 @@
 
 .searchInput:focus-visible {
   outline: none;
-  box-shadow: inset 0 0 0 1px var(--color-accent);
+  box-shadow:
+    inset 0 0 0 1px var(--color-accent),
+    var(--shadow-search-hover);
 }
 
 .content {
   flex: 1;
   min-width: 0;
-  padding: var(--space-6) clamp(var(--space-6), 3vw, var(--space-8)) var(--space-7);
+  /* Aire para que la portada ampliada y su resplandor no se corten en los bordes. */
+  padding: clamp(var(--space-6), 2.6vw, var(--space-7)) clamp(var(--space-5), 2.6vw, var(--space-7)) var(--space-8);
   overflow-y: auto;
+  /* Las portadas se desvanecen al pasar bajo la barra superior, sin corte duro. */
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 var(--space-5));
+  mask-image: linear-gradient(to bottom, transparent 0, #000 var(--space-5));
 }
 
 /*
@@ -59,12 +77,12 @@
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(var(--cover-min), 1fr));
-  gap: clamp(var(--space-5), 2vw, var(--space-6)) clamp(var(--space-5), 2.2vw, var(--space-7));
+  gap: clamp(var(--space-5), 2vw, var(--space-6)) clamp(var(--space-4), 1.8vw, var(--space-6));
 }
 
 .skeleton {
   aspect-ratio: 2 / 3;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md);
   background: var(--cover-placeholder);
 }
 
@@ -80,10 +98,10 @@
 
 .blankTitle {
   margin: 0;
-  color: var(--color-accent);
+  color: var(--text-primary);
   font-family: var(--font-title);
   font-weight: var(--weight-title);
-  font-size: var(--fs-title-sm);
+  font-size: var(--fs-title);
 }
 
 .blankText {
@@ -99,16 +117,21 @@
 
 .empty {
   margin: var(--space-3);
-  color: var(--color-accent);
+  color: var(--text-primary);
   font-size: var(--fs-body-sm);
 }
 
 .status {
-  margin-top: var(--space-5);
+  flex: none;
+  padding-right: var(--space-1);
+}
+
+.status:not(:empty) {
+  margin-top: var(--space-3);
 }
 
 .syncing {
-  margin: 0 var(--space-3);
+  margin: 0 var(--space-2);
   color: var(--state-disabled-text);
   font-weight: var(--weight-label);
   font-size: var(--fs-label);
